@@ -58,7 +58,7 @@ Explique que eles verificam esses testes e porquê.
 Dar exemplos
 ```
 
-```
+
 
 ## 📦 Implantação
 
@@ -79,10 +79,10 @@ Mencione as ferramentas que você usou para criar seu projeto
 
 
 
-* **Graziele** - *Desenvolvedora* - [umdesenvolvedor](https://github.com/Graziele-Rodrigues)
-* **Gessica** - *Desenvolvedora* - [umdesenvolvedor](https://github.com/linkParaPerfil)
-* **Laura** - *Desenvolvedora* -  [umdesenvolvedor](https://github.com/linkParaPerfil)
-* **Luisa** - *Desenvolvedora* - [umdesenvolvedor](https://github.com/LauraMarques20)
+* **Graziele** - *Desenvolvedora* - [Graziele](https://github.com/Graziele-Rodrigues)
+* **Gessica** - *Desenvolvedora* - [Gessica](https://github.com/linkParaPerfil)
+* **Laura** - *Desenvolvedora* -  [Laura](https://github.com/linkParaPerfil)
+* **Luisa** - *Desenvolvedora* - [Luisa](https://github.com/LauraMarques20)
 .
 
 
