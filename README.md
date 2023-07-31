@@ -17,8 +17,8 @@ Sistema para cadastro de produtos musicais a serem distribuídos pela distribuid
  
 3. Visualização dos ganhos recebidos por produto.
 
-<img src="/img/img/conceitual.png">
-<img src="/img/img/logico.png">
+<img src="/img/conceitual.png">
+<img src="/img/logico.png">
 
 ### 📋 Pré-requisitos
 
