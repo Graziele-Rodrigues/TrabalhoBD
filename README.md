@@ -79,10 +79,10 @@ Mencione as ferramentas que você usou para criar seu projeto
 
 
 
-* **Graziele** - *Desenvolvedora* - [Graziele](https://github.com/Graziele-Rodrigues)
-* **Gessica** - *Desenvolvedora* - [Gessica](https://github.com/linkParaPerfil)
-* **Laura** - *Desenvolvedora* -  [Laura](https://github.com/linkParaPerfil)
-* **Luisa** - *Desenvolvedora* - [Luisa](https://github.com/LauraMarques20)
+* **Graziele** - *Desenvolvedora* - [GitHub Graziele](https://github.com/Graziele-Rodrigues)
+* **Gessica** - *Desenvolvedora* - [GitHub Gessica](https://github.com/linkParaPerfil)
+* **Laura** - *Desenvolvedora* -  [GitHub Laura](https://github.com/linkParaPerfil)
+* **Luisa** - *Desenvolvedora* - [GitHub Luisa](https://github.com/LauraMarques20)
 .
 
 
