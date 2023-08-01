@@ -22,29 +22,41 @@ Sistema para cadastro de produtos musicais a serem distribuídos pela distribuid
 
 ### 📋 Pré-requisitos
 
-De que coisas você precisa para instalar o software e como instalá-lo?
-
+1. VsCode ou outro editor como pycharm -  [Baixe vsCode aqui ](https://code.visualstudio.com/download)
+2. python 3.x.x - [Baixe python aqui](http://www.sis4.com/brModelo/)
+3. pip - pacote gerenciamento padrão
+4. SGBD - pgAdmin ou Dbeaver -  [Baixe pgAdmin aqui](https://www.pgadmin.org/)
 ```
-Dar exemplos
+
 ```
 
 ### 🔧 Instalação
 
-Uma série de exemplos passo-a-passo que informam o que você deve executar para ter um ambiente de desenvolvimento em execução.
-
-Diga como essa etapa será:
+Instalação biblioteca tkinter:
 
 ```
-Dar exemplos
+pip3 install tk
 ```
 
-E repita:
+Verificar se foi instalado corretamente, use o seguinte código em um arquivo.py
 
 ```
-Até finalizar
+import tkinter
+tkinter._test()
 ```
 
-Termine com um exemplo de como obter dados do sistema ou como usá-los para uma pequena demonstração.
+Instalação biblioteca customTkinter:
+
+```
+pip3 install customtkinter
+```
+
+Instalação biblioteca conexão PostgreSQL:
+
+```
+pip3 install psycopg2
+```
+
 
 ## ⚙️ Executando os testes
 
@@ -66,13 +78,9 @@ Adicione notas adicionais sobre como implantar isso em um sistema ativo
 
 ## 🛠️ Construído com
 
-Mencione as ferramentas que você usou para criar seu projeto
-
 * [BrModelo](http://www.sis4.com/brModelo/) - Software para construir modelo conceitual ER e lógico
 * [ElephantSQL](https://www.elephantsql.com/) - Banco de Dados PostgreSQL como serviço
 * [Tkinter](https://rometools.github.io/rome/) - Biblioteca python para desenvolver interface gráfica
-
-
 
 
 ## ✒️ Autores
@@ -81,8 +89,8 @@ Mencione as ferramentas que você usou para criar seu projeto
 
 * **Graziele** - *Desenvolvedora* - [GitHub Graziele](https://github.com/Graziele-Rodrigues)
 * **Gessica** - *Desenvolvedora* - [GitHub Gessica](https://github.com/linkParaPerfil)
-* **Laura** - *Desenvolvedora* -  [GitHub Laura](https://github.com/linkParaPerfil)
-* **Luisa** - *Desenvolvedora* - [GitHub Luisa](https://github.com/LauraMarques20)
+* **Laura** - *Desenvolvedora* -  [GitHub Laura](https://github.com/LauraMarques20)
+* **Luisa** - *Desenvolvedora* - [GitHub Luisa](https://github.com/linkParaPerfil)
 .
 
 
