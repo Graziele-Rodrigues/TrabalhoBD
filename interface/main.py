@@ -39,21 +39,31 @@ class Usuario:
         self.telaLogin()
 
     def login(self):
-            username = "12345"
-            password = "12345"
-            
-            # testando credenciais 
-            if self.user_entry.get() == username and self.user_pass.get() == password:
-                # Oculta a janela de login
-                app.withdraw()
-                Produto(app)
-                
-            elif self.user_entry.get() == username and self.user_pass.get() != password:
-                tkmb.showwarning(title='Senha incorreta',message='Senha incorreta')
-            elif self.user_entry.get() != username and self.user_pass.get() == password:
-                tkmb.showwarning(title='Usuário incorreto',message='Usuário incorreto')
-            else:
-                tkmb.showerror(title="Falha no login", message="usuário e senha incorretos")
+        # conectando banco de dados
+        banco = Banco()
+        bd = banco.conexao.cursor()
+
+        # realiza busca
+        buscaCnpj = """ SELECT "CNPJ" FROM public."Usuario" where "CNPJ" = %s; """
+        buscaSenha = """ SELECT "Senha" FROM public."Usuario" where "CNPJ" = %s; """
+        bd.execute(buscaCnpj, (self.user_entry.get(),))
+        username = bd.fetchone()
+
+        bd.execute(buscaSenha, (self.user_entry.get(),))
+        password = bd.fetchone()
+
+        # fecha comunicação com banco
+        bd.close()
+
+        # testando credenciais
+        if username and password and self.user_pass.get() == password[0]:
+            # Oculta a janela de login
+            app.withdraw()
+            Produto(app)
+        elif username and self.user_pass.get() != password[0]:
+            tkmb.showwarning(title='Senha incorreta', message='Senha incorreta')
+        else:
+            tkmb.showerror(title="Falha no login", message="usuário e senha incorretos")
             
 
     def telaLogin(self):
@@ -90,7 +100,6 @@ class Usuario:
     
 
     def enviaDadosUsuarios(self):
-        tkmb.showinfo(title="CadastradoSucesso", message="Cadastro realizado com sucesso!")
         #conectando banco de dados
         banco = Banco()
         bd = banco.conexao.cursor()
@@ -106,10 +115,9 @@ class Usuario:
             print(error)
         finally:
             if banco is not None:
-                print("Dados inseridos com sucesso!")
+                tkmb.showinfo(title="CadastradoSucesso", message="Cadastro realizado com sucesso!")
 
     def cadastro(self):
-            app.withdraw()
             telaCadastro = ctk.CTkToplevel(app)
             telaCadastro.title("Tela Cadastro")
             telaCadastro.geometry("700x700")
