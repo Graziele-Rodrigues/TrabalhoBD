@@ -1,7 +1,8 @@
 import customtkinter as ctk
 import tkinter.messagebox as tkmb
 from PIL import Image, ImageTk
-
+import psycopg2
+from conexaobd import Banco
 
 # selecionando o tema - dark, light , system (for system default)
 ctk.set_appearance_mode("dark")
@@ -21,6 +22,7 @@ class Produto:
             self.cadastrarProdutos()
               
         def cadastrarProdutos(self):
+            
             telaCadastroProduto = ctk.CTkToplevel(app)
             telaCadastroProduto.geometry("700x700")
             telaCadastroProduto.title("Produtos")
@@ -29,6 +31,7 @@ class Produto:
 
             self.frameTelaProduto = ctk.CTkFrame(master=telaCadastroProduto)
             self.frameTelaProduto.pack(pady=20, padx=40, fill='both', expand=True)
+            
             
 class Usuario:
     def __init__(self, app):
@@ -86,9 +89,24 @@ class Usuario:
             self.checkbox.pack(pady=12,padx=10)
     
 
-    def enviaDados(self):
+    def enviaDadosUsuarios(self):
         tkmb.showinfo(title="CadastradoSucesso", message="Cadastro realizado com sucesso!")
-
+        #conectando banco de dados
+        banco = Banco()
+        bd = banco.conexao.cursor()
+        try:
+            # execute the INSERT statement
+            sql = """INSERT INTO public."Usuario"("Nome", "Email", "Senha", "CNPJ", "DadosBancario") VALUES(%s, %s, %s,%s,%s)"""
+            bd.execute(sql, (self.nameEntry.get(), self.emailEntry.get(), self.senhaEntry.get(), self.cnpjEntry.get(), self.bancoEntry.get()))
+            # commit the changes to the database
+            banco.conexao.commit()
+            # close communication with the database
+            bd.close()
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            if banco is not None:
+                print("Dados inseridos com sucesso!")
 
     def cadastro(self):
             app.withdraw()
@@ -120,7 +138,7 @@ class Usuario:
             self.senhaLabel = ctk.CTkLabel(master=self.frameCadastro, text="Senha", font=placeholder_botao)
             self.senhaLabel.grid(row=2, column=0, padx=20, pady=20, sticky="ew")
              # Senha Entry Field
-            self.senhaEntry = ctk.CTkEntry(master=self.frameCadastro, placeholder_text="senha - apenas caracteres", font=placeholder_botao, width=400)
+            self.senhaEntry = ctk.CTkEntry(master=self.frameCadastro, placeholder_text="senha", font=placeholder_botao, width=400)
             self.senhaEntry.grid(row=2, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
 
             # CNPJ Label
@@ -138,7 +156,7 @@ class Usuario:
             self.bancoEntry = ctk.CTkEntry(master=self.frameCadastro, placeholder_text="n° conta, n° banco, n° agencia", font=placeholder_botao, width=400)
             self.bancoEntry.grid(row=4, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
 
-            self.botaoCadastro = ctk.CTkButton(master=self.frameCadastro,text='Cadastrar', width=250, font=placeholder_botao, command=self.enviaDados)
+            self.botaoCadastro = ctk.CTkButton(master=self.frameCadastro,text='Cadastrar', width=250, font=placeholder_botao, command=self.enviaDadosUsuarios)
             self.botaoCadastro.grid(row=5, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
 
 
