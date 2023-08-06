@@ -22,7 +22,7 @@ class Produto:
         def __init__(self, app, cnpj):
             self.app = app
             self.cnpj = cnpj
-            self.cadastroPessoas()
+            self.index()
               
         def cadastroPessoas(self):
             telaCadastroPessoas = ctk.CTkToplevel(app)
@@ -162,10 +162,135 @@ class Produto:
         
         def cadastroProdutos(self):
              pass
-            
+        
+        def editaProdutos(self):
+             pass
+        
+        def deletaProduto(self):
+            telaDeletarProduto = ctk.CTkToplevel(app)
+            telaDeletarProduto.title("Deletar produto")
+            telaDeletarProduto.geometry("700x300")
+
+            self.label = ctk.CTkLabel(telaDeletarProduto,text="Preencha os campos abaixo:", font=title_font)
+            self.label.pack(pady=10)
+
+            #frame
+            self.frameDeletaProduto = ctk.CTkFrame(master=telaDeletarProduto)
+            self.frameDeletaProduto.pack(pady=20, padx=40, fill='both', expand=True)
+
+            # Codigo Barras Label
+            self.codigoBarrasLabel = ctk.CTkLabel(master=self.frameDeletaProduto, text="Código de barras", font=placeholder_botao)
+            self.codigoBarrasLabel.grid(row=0, column=0, padx=20, pady=20, sticky="ew")
+
+            # CodigoBarras Entry Field
+            self.codigoBarrasEntry = ctk.CTkEntry(master=self.frameDeletaProduto, placeholder_text="Digite o código de barras do produto", font=placeholder_botao, width=400)
+            self.codigoBarrasEntry.grid(row=0, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+
+            #botão para procurar os produtos
+            self.botaoProcurarProduto = ctk.CTkButton(master=self.frameDeletaProduto,text='Procurar produto', width=250, font=placeholder_botao, command=self.enviaCodigoBarrasDelete)
+            self.botaoProcurarProduto.grid(row=5, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+        
+        def enviaCodigoBarrasDelete(self):
+            # conectando banco de dados
+            banco = Banco()
+            bd = banco.conexao.cursor()
+
+            # realiza busca
+            buscaCodigoBarras = """ SELECT "CodigoBarras" FROM public."Produto" where "CodigoBarras" = %s; """
+            bd.execute(buscaCodigoBarras, (self.codigoBarrasEntry.get(),))
+            self.buscaCodigoBarras = bd.fetchone()
+
+            # fecha comunicação com banco
+            bd.close()
+
+            if self.buscaCodigoBarras:
+                self.mostrarProdutoDelete()
+            else:
+                tkmb.showerror(title="Erro", message="Não há nenhum produto com esse código de barras!")
+
+        def mostrarProdutoDelete(self):
+            telaMostrarProdutoDelete = ctk.CTkToplevel(app)
+            telaMostrarProdutoDelete.title("Produto encontrado")
+            telaMostrarProdutoDelete.geometry("700x200")
+
+            self.label = ctk.CTkLabel(telaMostrarProdutoDelete,text="Produto encontrado! Certeza que deseja excluir?", font=title_font)
+            self.label.pack(pady=10)
+
+            #frame
+            self.frameDeletaProduto = ctk.CTkFrame(master=telaMostrarProdutoDelete)
+            self.frameDeletaProduto.pack(pady=20, padx=40, fill='both', expand=True)
+
+            #botão para para deletar produto
+            self.botaoDeletarProduto = ctk.CTkButton(master=self.frameDeletaProduto,text='Deletar produto', width=250, font=placeholder_botao, command=self.deletarProduto)
+            self.botaoDeletarProduto.grid(row=1, column=3, columnspan=3, padx=10, pady=20, sticky="ew")           
+
+        def deletarProduto(self):
+            try:
+                # conectando banco de dados
+                banco = Banco()
+                bd = banco.conexao.cursor()
+
+                # realiza busca
+                deleteProduto = """ DELETE FROM public."Produto" where "CodigoBarras" = %s; """
+                bd.execute(deleteProduto, (self.codigoBarrasEntry.get(),))
+                banco.conexao.commit()
+
+                # fecha comunicação com banco
+                bd.close()
+
+                # Mensagem de sucesso
+                tkmb.showinfo(title="Deletado com sucesso", message="Produto deletado com sucesso!")
+            except Exception as e:
+                    # Em caso de erro, mostra a mensagem de erro
+                    tkmb.showerror(title="Erro", message="Ocorreu um erro ao deletar o produto: " + str(e))
+
+
+
         def visualizarRelatorios(self):
              pass
-            
+        
+        
+        def index(self):
+            index = ctk.CTkToplevel(app)
+            index.geometry("1000x1000")
+            index.title("Tela inicial")
+
+            # Criar a imagem
+            self.my_image = Image.open("interface/image/logo.png")
+            self.my_image = ImageTk.PhotoImage(self.my_image.resize((150, 150)))  # Resize the image
+            self.image_label = ctk.CTkLabel(index, image=self.my_image, text="")
+            self.image_label.grid(row=0, column=0, padx=20, pady=20, sticky="w")
+
+            # Criar o rótulo
+            self.label = ctk.CTkLabel(index, text="Distribuidora digital de música", font=title_font)
+            self.label.grid(row=0, column=1, padx=20, pady=20, sticky="w")
+            #  Criar frame
+            self.frameIndex = ctk.CTkFrame(master=index)
+            self.frameIndex.grid(row=1, column=0, columnspan=2, padx=40, pady=20, sticky="ew")
+            # Criar os botões
+            self.botaoArtista = ctk.CTkButton(master=self.frameIndex, text='Cadastrar artistas', width=250, font=placeholder_botao, command=self.cadastroPessoas)
+            self.botaoArtista.grid(row=0, column=0, padx=20, pady=20, sticky="ew")
+            self.botaoRelatorio = ctk.CTkButton(master=self.frameIndex, text='Relatorios', width=250, font=placeholder_botao, command=self.visualizarRelatorios)
+            self.botaoRelatorio.grid(row=0, column=1, padx=20, pady=20, sticky="ew")
+
+            # Cria Frame
+            self.frameIndex2 = ctk.CTkFrame(master=index)
+            self.frameIndex2.grid(row=2, column=0, columnspan=2, padx=40, pady=20, sticky="ew")
+
+            # Criar o botão para cadastrar produto
+            self.btn_cadastraProduto = ctk.CTkButton(master=self.frameIndex2, text="Cadastrar produto", command=self.cadastroProdutos)
+            self.btn_cadastraProduto.grid(row=1, column=0, padx=30, pady=10, sticky="ew")
+
+            # Criar o botão para editar produto
+            self.btn_editaProduto = ctk.CTkButton(master=self.frameIndex2, text="Editar produto", command=self.editaProdutos)
+            self.btn_editaProduto.grid(row=1, column=1, padx=30, pady=10, sticky="ew")
+
+            # Criar o botão para deletar produtos
+            self.btn_deletaProduto = ctk.CTkButton(master=self.frameIndex2, text="Deletar produto", command=self.deletaProduto)
+            self.btn_deletaProduto.grid(row=1, column=1, padx=30, pady=10, sticky="ew")
+
+           
+
             
 class Usuario:
     def __init__(self, app):
@@ -303,6 +428,9 @@ class Usuario:
             # botao
             self.botaoCadastro = ctk.CTkButton(master=self.frameCadastro,text='Cadastrar', width=250, font=placeholder_botao, command=self.enviaDadosUsuarios)
             self.botaoCadastro.grid(row=5, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+
+    # def todosProdutos(self): 
+         
 
 
 if __name__ == "__main__":
