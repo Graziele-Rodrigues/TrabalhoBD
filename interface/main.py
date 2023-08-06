@@ -161,12 +161,10 @@ class Produto:
              pass
         
         def cadastroProdutos(self):
-            user = Usuario(app)
-            cnpjUser = user.user_entry
+             pass
             
         def visualizarRelatorios(self):
-            user = Usuario(app)
-            cnpjUser = user.user_entry
+             pass
             
             
 class Usuario:
