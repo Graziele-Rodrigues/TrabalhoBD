@@ -247,9 +247,188 @@ class Produto:
 
 
         def visualizarRelatorios(self):
-             pass
+            telaRelatorios = ctk.CTkToplevel(app)
+            telaRelatorios.title("Relatórios")
+            telaRelatorios.geometry("700x300")
+
+            self.label = ctk.CTkLabel(telaRelatorios,text="Consultar dados", font=title_font)
+            self.label.pack(pady=10)
+
+            #faça um botão para consultar faixa, artista e album
+            self.botaoFaixa = ctk.CTkButton(master=telaRelatorios,text='Consultar faixa', width=250, font=placeholder_botao, command=self.consultarFaixa)
+            self.botaoFaixa.pack(pady=10,padx=10)
+
+            self.botaoAlbum = ctk.CTkButton(master=telaRelatorios,text='Consultar album', width=250, font=placeholder_botao, command=self.consultarAlbum)
+            self.botaoAlbum.pack(pady=10,padx=10)
+
+            self.botaoArtista = ctk.CTkButton(master=telaRelatorios,text='Consultar artista', width=250, font=placeholder_botao, command=self.consultarArtista)
+            self.botaoArtista.pack(pady=10,padx=10)
+
         
+
+        def consultarFaixa(self):
+            telaConsultarFaixa = ctk.CTkToplevel(app)
+            telaConsultarFaixa.title("Consultar nímero de reproduções de uma faixa")
+            telaConsultarFaixa.geometry("700x300")
+
+            self.label = ctk.CTkLabel(telaConsultarFaixa,text="Consultar nímero de reproduções de uma faixa", font=title_font)
+            self.label.pack(pady=10)
+
+            #frame
+            self.frameConsultarFaixa = ctk.CTkFrame(master=telaConsultarFaixa)
+            self.frameConsultarFaixa.pack(pady=20, padx=40, fill='both', expand=True)
+
+            # ISRC Label
+            self.isrcLabel = ctk.CTkLabel(master=self.frameConsultarFaixa, text="ISRC", font=placeholder_botao)
+            self.isrcLabel.grid(row=0, column=0, padx=20, pady=20, sticky="ew")
+
+            # ISRC Entry Field
+            self.isrcEntry = ctk.CTkEntry(master=self.frameConsultarFaixa, placeholder_text="Digite o ISRC da faixa", font=placeholder_botao, width=400)
+            self.isrcEntry.grid(row=0, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+
+            #botão para procurar as faixas
+            self.botaoProcurarFaixa = ctk.CTkButton(master=self.frameConsultarFaixa,text='Procurar faixa', width=250, font=placeholder_botao, command=self.enviarIsrc)
+            self.botaoProcurarFaixa.grid(row=5, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+
+        def enviarIsrc(self):
+            # conectando banco de dados
+            banco = Banco()
+            bd = banco.conexao.cursor()
+
+            # realiza busca
+            buscaIsrc = """ SELECT "QuantidadeReproducao" FROM public."Reproduzida" where "fk_FaixaMusical_Single_ISRC" = %s; """
+            bd.execute(buscaIsrc, (self.isrcEntry.get(),))
+            self.buscaIsrc = bd.fetchone()
+
+            numeroReproducoes = self.buscaIsrc[0]
+
+            # fecha comunicação com banco
+            bd.close()
+
+            if self.buscaIsrc:
+                self.mostrarFaixa(numeroReproducoes)
+            else:
+                tkmb.showerror(title="Erro", message="Não há nenhuma faixa com esse ISRC!")
+
+        def mostrarFaixa(self, numeroReproducoes):
+            telaMostrarFaixa = ctk.CTkToplevel(app)
+            telaMostrarFaixa.title("Faixa encontrada")
+            telaMostrarFaixa.geometry("700x200")
+
+            #mostrar o resultado da busca
+            self.label = ctk.CTkLabel(telaMostrarFaixa,text="Faixa encontrada! Número de reproduções: " + str(numeroReproducoes), font=title_font)
+            self.label.pack(pady=10)
+
+        def consultarAlbum(self):
+            telaConsultarAlbum = ctk.CTkToplevel(app)
+            telaConsultarAlbum.title("Consultar nímero de reproduções de um album")
+            telaConsultarAlbum.geometry("700x300")
+
+            self.label = ctk.CTkLabel(telaConsultarAlbum,text="Consultar nímero de reproduções de um album", font=title_font)
+            self.label.pack(pady=10)
+
+            #frame
+            self.frameConsultarAlbum = ctk.CTkFrame(master=telaConsultarAlbum)
+            self.frameConsultarAlbum.pack(pady=20, padx=40, fill='both', expand=True)
+            
+            # Codigo Barras Label
+            self.codigoBarrasLabel = ctk.CTkLabel(master=self.frameConsultarAlbum, text="Código de barras", font=placeholder_botao)
+            self.codigoBarrasLabel.grid(row=0, column=0, padx=20, pady=20, sticky="ew")
+
+            # CodigoBarras Entry Field
+            self.codigoBarrasEntry = ctk.CTkEntry(master=self.frameConsultarAlbum, placeholder_text="Digite o código de barras do album", font=placeholder_botao, width=400)
+            self.codigoBarrasEntry.grid(row=0, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+
+            #botão para procurar os produtos
+            self.botaoProcurarAlbum = ctk.CTkButton(master=self.frameConsultarAlbum,text='Procurar album', width=250, font=placeholder_botao, command=self.enviarCodigoBarrasAlbum)
+            self.botaoProcurarAlbum.grid(row=5, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+
+
+        def enviarCodigoBarrasAlbum(self):
+            # conectando banco de dados
+            banco = Banco()
+            bd = banco.conexao.cursor()
+
+            # realiza busca
+            buscaCodigoBarras = """ SELECT "QuantidadeReproducao" FROM public."Reproduzida" where "fk_FaixaMusical_Single_fk_Produto_CodigoBarras" = %s; """
+            bd.execute(buscaCodigoBarras, (self.codigoBarrasEntry.get(),))
+            self.buscaCodigoBarras = bd.fetchone()
+
+            numeroReproducoes = self.buscaCodigoBarras[0]
+
+            # fecha comunicação com banco
+            bd.close()
+
+            if self.buscaCodigoBarras:
+                self.mostrarAlbum(numeroReproducoes)
+            else:
+                tkmb.showerror(title="Erro", message="Não há nenhum album com esse código de barras!")
         
+        def mostrarAlbum(self, numeroReproducoes):
+            telaMostrarAlbum = ctk.CTkToplevel(app)
+            telaMostrarAlbum.title("Album encontrado")
+            telaMostrarAlbum.geometry("700x200")
+
+            #mostrar o resultado da busca
+            self.label = ctk.CTkLabel(telaMostrarAlbum,text="Album encontrado! Número de reproduções: " + str(numeroReproducoes), font=title_font)
+            self.label.pack(pady=10)
+        
+        def consultarArtista(self):
+            telaConsultarArtista = ctk.CTkToplevel(app)
+            telaConsultarArtista.title("Consultar nímero de reproduções de um artista")
+            telaConsultarArtista.geometry("700x300")
+
+            self.label = ctk.CTkLabel(telaConsultarArtista,text="Consultar nímero de reproduções de um artista", font=title_font)
+            self.label.pack(pady=10)
+
+            #frame
+            self.frameConsultarArtista = ctk.CTkFrame(master=telaConsultarArtista)
+            self.frameConsultarArtista.pack(pady=20, padx=40, fill='both', expand=True)
+            
+            # cpf Label
+            self.cpfLabel = ctk.CTkLabel(master=self.frameConsultarArtista, text="CPF", font=placeholder_botao)
+            self.cpfLabel.grid(row=0, column=0, padx=20, pady=20, sticky="ew")
+
+            # cpf Entry Field
+            self.cpfEntry = ctk.CTkEntry(master=self.frameConsultarArtista, placeholder_text="Digite o cpf do artista", font=placeholder_botao, width=400)
+            self.cpfEntry.grid(row=0, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+
+            #botão para procurar os produtos
+            self.botaoProcurarArtista = ctk.CTkButton(master=self.frameConsultarArtista,text='Procurar artista', width=250, font=placeholder_botao, command=self.enviarCpfArtista)
+            self.botaoProcurarArtista.grid(row=5, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+
+        def enviarCpfArtista(self):
+            # conectando banco de dados
+            banco = Banco()
+            bd = banco.conexao.cursor()
+
+            # realiza busca
+            buscaCpf = """ SELECT SUM(DISTINCT "QuantidadeReproducao") 
+            FROM public."Reproduzida", public."Participa"
+            where "fk_Pessoa_CPF" = %s and "TipoPessoa" = 'Artista' """
+            bd.execute(buscaCpf, (self.cpfEntry.get(),))
+            self.buscaCpf = bd.fetchone()
+
+            numeroReproducoes = self.buscaCpf[0]
+
+            # fecha comunicação com banco
+            bd.close()
+
+            if self.buscaCpf:
+                self.mostrarArtista(numeroReproducoes)
+            else:
+                tkmb.showerror(title="Erro", message="Não há nenhum artista com esse nome!")
+
+        def mostrarArtista(self, numeroReproducoes):
+            telaMostrarArtista = ctk.CTkToplevel(app)
+            telaMostrarArtista.title("Artista encontrado")
+            telaMostrarArtista.geometry("700x200")
+
+            #mostrar o resultado da busca
+            self.label = ctk.CTkLabel(telaMostrarArtista,text="Artista encontrado! Número de reproduções: " + str(numeroReproducoes), font=title_font)
+            self.label.pack(pady=10)
+
+
         def index(self):
             index = ctk.CTkToplevel(app)
             index.geometry("1000x1000")
