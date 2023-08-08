@@ -12,11 +12,14 @@ ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
 # cria tkinter geral
 app = ctk.CTk()
-telaCadastro = ctk.CTk()
-telaCadastroPessoas = ctk.CTk()
 # configura fontes
 title_font = ctk.CTkFont(family="sans-serif", size=20, slant="italic", weight="bold")
 placeholder_botao = ctk.CTkFont(family="arial", size=15) 
+
+class Faixas:
+        def __init__(self, app, codigoBarras):
+            self.app = app
+            self.codigoBarras = codigoBarras
 
 class Produto:
         def __init__(self, app, cnpj):
@@ -25,59 +28,118 @@ class Produto:
             self.index()
               
         def cadastroPessoas(self):
-            telaCadastroPessoas = ctk.CTkToplevel(app)
-            telaCadastroPessoas.geometry("800x800")
-            telaCadastroPessoas.title("CadastroPessoas")
+            telaPessoas = ctk.CTkToplevel(self.app)  # Use self.app here
+            telaPessoas.title("Deletar produto")
+            telaPessoas.geometry("800x800")
 
-            # Criar a imagem
-            self.my_image = Image.open("interface/image/logo.png")
-            self.my_image = ImageTk.PhotoImage(self.my_image.resize((150, 150)))  # Resize the image
-            self.image_label = ctk.CTkLabel(telaCadastroPessoas, image=self.my_image, text="")
-            self.image_label.grid(row=0, column=0, padx=20, pady=20, sticky="w")
+            self.label = ctk.CTkLabel(telaPessoas, text="Verifique se a pessoa já existe em nosso sistema, caso não, crie", font=title_font)
+            self.label.pack(pady=10)
 
-            # Criar o rótulo
-            self.label = ctk.CTkLabel(telaCadastroPessoas, text="Distribuidora digital de música", font=title_font)
-            self.label.grid(row=0, column=1, padx=20, pady=20, sticky="w")
-            # Criar frame
-            self.frameTelaProduto = ctk.CTkFrame(master=telaCadastroPessoas)
-            self.frameTelaProduto.grid(row=1, column=0, columnspan=2, padx=40, pady=20, sticky="ew")
-            # Criar os botões
-            self.botaoProduto = ctk.CTkButton(master=self.frameTelaProduto, text='Produtos', width=250, font=placeholder_botao, command=self.cadastroProdutos)
-            self.botaoProduto.grid(row=0, column=0, padx=20, pady=20, sticky="ew")
-            self.botaoRelatorio = ctk.CTkButton(master=self.frameTelaProduto, text='Relatorios', width=250, font=placeholder_botao, command=self.visualizarRelatorios)
-            self.botaoRelatorio.grid(row=0, column=1, padx=20, pady=20, sticky="ew")
+            self.frameTelaCadastroPessoas = ctk.CTkFrame(master=telaPessoas)
+            self.frameTelaCadastroPessoas.pack(pady=20, padx=40, fill='both', anchor=tk.CENTER, expand=True)
 
-            # Cria Frame
-            self.frameTelaProduto2 = ctk.CTkFrame(master=telaCadastroPessoas)
-            self.frameTelaProduto2.grid(row=2, column=0, columnspan=2, padx=40, pady=20, sticky="ew")
-
-            # Criar o widget de caixa de consulta
-            self.entry_consulta1 = ctk.CTkEntry(master=self.frameTelaProduto2, placeholder_text="Nome", width=200, font=("Arial", 12))
+            self.entry_consulta1 = ctk.CTkEntry(master=self.frameTelaCadastroPessoas, placeholder_text="Nome", width=300, font=("Arial", 12))
             self.entry_consulta1.grid(row=0, column=0, padx=30, pady=10, sticky="ew")
 
-            # Criar o widget de caixa de consulta
-            self.entry_consulta2 = ctk.CTkEntry(master=self.frameTelaProduto2, placeholder_text="Cnpj", width=200, font=("Arial", 12))
+            self.entry_consulta2 = ctk.CTkEntry(master=self.frameTelaCadastroPessoas, placeholder_text="Cpf", width=300, font=("Arial", 12))
             self.entry_consulta2.grid(row=0, column=1, padx=30, pady=10, sticky="ew")
 
-            # Criar o botão para consultar
-            self.btn_consultar = ctk.CTkButton(master=self.frameTelaProduto2, text="Consultar", command=self.consultarDadosPessoas)
+            self.btn_consultar = ctk.CTkButton(master=self.frameTelaCadastroPessoas, text="Consultar",  width=300, command=self.consultaDadosPessoas)
             self.btn_consultar.grid(row=1, column=0, padx=30, pady=10, sticky="ew")
 
-            # Criar o botão para criarNovaPessoa
-            self.btn_criaPessoa = ctk.CTkButton(master=self.frameTelaProduto2, text="Nova Pessoa", command=self.criaNovaPessoa)
-            self.btn_criaPessoa.grid(row=1, column=1, padx=30, pady=10, sticky="ew")
+            self.btn_limpaConsulta = ctk.CTkButton(master=self.frameTelaCadastroPessoas, text="Limpa Consulta",  width=300, command=self.exibePessoas)
+            self.btn_limpaConsulta.grid(row=1, column=1, padx=30, pady=10, sticky="ew")
 
-            # Cria Frame
-            self.frameTelaProduto3 = ctk.CTkFrame(master=telaCadastroPessoas)
-            self.frameTelaProduto3.grid(row=3, column=0, columnspan=2, padx=40, pady=20, sticky="ew")
+            self.btn_criaNovaPessoa = ctk.CTkButton(master=self.frameTelaCadastroPessoas, text="Nova Pessoa", width=600, command=self.criaNovaPessoa)
+            self.btn_criaNovaPessoa.grid(row=2, column=0, columnspan=2, padx=30, pady=10, sticky="ew")
 
-            # Exibe Tabela com resultados
+            self.exibePessoas()
+
+        def exibePessoas(self):
+            # Cria a tabela
             self.columns = ("Nome", "EmailContato", "RedeSocial")
-            self.table = ttk.Treeview(master=self.frameTelaProduto3, columns=self.columns, show="headings", height=10)
+            self.table = ttk.Treeview(master=self.frameTelaCadastroPessoas, columns=self.columns, show="headings", height=10)
             for col in self.columns:
                 self.table.heading(col, text=col)
-            self.table.grid(row=0, column=0, padx=30, pady=10, sticky="ew")
+                self.table.column(col, anchor="center")  # Centraliza o conteúdo das células
+            self.table.grid(row=3, column=0, columnspan=2, padx=30, pady=10, sticky="ew")
 
+            # Aumenta a largura das colunas da tabela
+            self.table.column("Nome", width=200)  # Ajuste a largura conforme necessário
+            self.table.column("EmailContato", width=200)  # Ajuste a largura conforme necessário
+            self.table.column("RedeSocial", width=200)  # Ajuste a largura conforme necessário
+
+            # Estiliza o cabeçalho da tabela (nomes das colunas)
+            style = ttk.Style()
+            style.configure("Treeview.Heading", font=("Arial", 10, "bold"), foreground="blue")  # Define fonte em negrito e cor azul
+
+            # Cria uma instância do banco
+            banco = Banco()
+            bd = banco.conexao.cursor()
+
+            try:
+                # Execute a consulta SQL para obter os dados das pessoas cadastradas
+                sql = """SELECT "Nome", "EmailContato", "RedeSocial" FROM public."Pessoa" """
+                bd.execute(sql)
+                dados_pessoas = bd.fetchall()
+
+                # Limpe a tabela antes de preencher novamente
+                for item in self.table.get_children():
+                    self.table.delete(item)
+
+                # Preencha a tabela com os dados obtidos da consulta
+                for pessoa in dados_pessoas:
+                    self.table.insert("", "end", values=pessoa)
+
+            except (Exception, psycopg2.DatabaseError) as error:
+                print(error)
+                # Exiba uma mensagem de erro se houver algum problema com a consulta
+
+            finally:
+                if banco is not None:
+                    banco.conexao.close()
+        
+        def consultaDadosPessoas(self):
+            filtro_nome = self.entry_consulta1.get()
+            filtro_cpf = self.entry_consulta2.get()
+
+            # Cria uma instância do banco
+            banco = Banco()
+            bd = banco.conexao.cursor()
+
+            try:
+                # Constrói a consulta SQL com filtros
+                sql = """SELECT "Nome", "EmailContato", "RedeSocial" FROM public."Pessoa" WHERE """
+                conditions = []
+
+                if filtro_nome:
+                    conditions.append(f'UPPER("Nome") LIKE UPPER(\'%{filtro_nome}%\')')
+
+                if filtro_cpf:
+                    conditions.append(f'UPPER("CPF") LIKE UPPER(\'%{filtro_cpf}%\')')
+
+                if conditions:
+                    sql += ' AND '.join(conditions)
+
+                # Execute a consulta SQL
+                bd.execute(sql)
+                dados_pessoas = bd.fetchall()
+
+                # Limpe a tabela antes de preencher novamente
+                for item in self.table.get_children():
+                    self.table.delete(item)
+
+                # Preencha a tabela com os dados obtidos da consulta
+                for pessoa in dados_pessoas:
+                    self.table.insert("", "end", values=pessoa)
+
+            except (Exception, psycopg2.DatabaseError) as error:
+                print(error)
+                # Exiba uma mensagem de erro se houver algum problema com a consulta
+
+            finally:
+                if banco is not None:
+                    banco.conexao.close()
 
         def criaNovaPessoa(self):
                 telaCriaNovaPessoa = ctk.CTkToplevel(app)
@@ -89,7 +151,7 @@ class Produto:
 
                 #frame
                 self.frameCriaNovaPessoa = ctk.CTkFrame(master=telaCriaNovaPessoa)
-                self.frameCriaNovaPessoa.pack(pady=20, padx=40, fill='both', expand=True)
+                self.frameCriaNovaPessoa.pack(pady=20, padx=40, fill='both', anchor=tk.CENTER, expand=True)
 
                 # Nome Label
                 self.namePessoaLabel = ctk.CTkLabel(master=self.frameCriaNovaPessoa, text="Nome", font=placeholder_botao)
@@ -122,6 +184,7 @@ class Produto:
                 # botao
                 self.botaoCadastroPessoa = ctk.CTkButton(master=self.frameCriaNovaPessoa,text='Cadastrar', width=250, font=placeholder_botao, command=self.enviaDadosPessoas)
                 self.botaoCadastroPessoa.grid(row=5, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+
 
         def enviaDadosPessoas(self):
                 banco = Banco()
@@ -156,69 +219,130 @@ class Produto:
                 finally:
                     if banco is not None:
                         banco.conexao.close()
-
-        def consultarDadosPessoas(self):
-             pass
         
+
         def cadastroProdutos(self):
-                    telaCadastrarProduto = ctk.CTkToplevel(app)
-                    telaCadastrarProduto.title("Cadastrar produto")
-                    telaCadastrarProduto.geometry("700x700")
+                telaCadastrarProduto = ctk.CTkToplevel(app)
+                telaCadastrarProduto.title("Cadastrar produto")
+                telaCadastrarProduto.geometry("800x800")
             
-                    self.label = ctk.CTkLabel(telaCadastrarProduto,text="Cadastre o produto:", font=title_font)
-                    self.label.pack(pady=10)
+                self.label = ctk.CTkLabel(telaCadastrarProduto,text="Cadastre o produto:", font=title_font)
+                self.label.pack(pady=10)
         
-                    #frame
-                    self.frameCadastro = ctk.CTkFrame(master=telaCadastro)
-                    self.frameCadastro.pack(pady=20, padx=40, fill='both', expand=True)
+                #frame
+                self.frameCadastro = ctk.CTkFrame(master=telaCadastrarProduto)
+                self.frameCadastro.pack(pady=20, padx=40, fill='both', anchor=tk.CENTER, expand=True)
         
-                    # Nome Label
-                    self.nameLabel = ctk.CTkLabel(master=self.frameCadastro, text="Nome", font=placeholder_botao)
-                    self.nameLabel.grid(row=0, column=0, padx=20, pady=20, sticky="ew")
-                    # Nome Entry Field
-                    self.nameEntry = ctk.CTkEntry(master=self.frameCadastro, placeholder_text="nome do álbum/single", font=placeholder_botao, width=400)
-                    self.nameEntry.grid(row=0, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+                # Nome Label
+                self.nameLabel = ctk.CTkLabel(master=self.frameCadastro, text="Nome", font=placeholder_botao)
+                self.nameLabel.grid(row=0, column=0, padx=20, pady=20, sticky="ew")
+                
+                # Nome Entry Field
+                self.nameEntry = ctk.CTkEntry(master=self.frameCadastro, placeholder_text="nome do álbum/single", font=placeholder_botao, width=400)
+                self.nameEntry.grid(row=0, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
         
-                    # Código de barras Label
-                    self.emailLabel = ctk.CTkLabel(master=self.frameCadastro, text="Código de barras", font=placeholder_botao)
-                    self.emailLabel.grid(row=1, column=0, padx=20, pady=20, sticky="ew")
-                    # Código de barra Entry Field
-                    self.emailEntry = ctk.CTkEntry(master=self.frameCadastro, placeholder_text="insira o codigo barras", font=placeholder_botao, width=400)
-                    self.emailEntry.grid(row=1, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+                # Código de barras Label
+                self.emailLabel = ctk.CTkLabel(master=self.frameCadastro, text="Código de barras", font=placeholder_botao)
+                self.emailLabel.grid(row=1, column=0, padx=20, pady=20, sticky="ew")
+                
+                # Código de barra Entry Field
+                self.emailEntry = ctk.CTkEntry(master=self.frameCadastro, placeholder_text="insira o codigo barras", font=placeholder_botao, width=400)
+                self.emailEntry.grid(row=1, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
         
-                    # Data de lançamento Label
-                    self.senhaLabel = ctk.CTkLabel(master=self.frameCadastro, text="Data de lançamento", font=placeholder_botao)
-                    self.senhaLabel.grid(row=2, column=0, padx=20, pady=20, sticky="ew")
-                     # Data de lançamento Entry Field
-                    self.senhaEntry = ctk.CTkEntry(master=self.frameCadastro, placeholder_text="insira a data", font=placeholder_botao, width=400)
-                    self.senhaEntry.grid(row=2, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+                # Data de lançamento Label
+                self.senhaLabel = ctk.CTkLabel(master=self.frameCadastro, text="Data de lançamento", font=placeholder_botao)
+                self.senhaLabel.grid(row=2, column=0, padx=20, pady=20, sticky="ew")
+                
+                # Data de lançamento Entry Field
+                self.senhaEntry = ctk.CTkEntry(master=self.frameCadastro, placeholder_text="insira a data", font=placeholder_botao, width=400)
+                self.senhaEntry.grid(row=2, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
         
-                    # Idioma Label
-                    self.cnpjLabel = ctk.CTkLabel(master=self.frameCadastro, text="Idioma", font=placeholder_botao)
-                    self.cnpjLabel.grid(row=3, column=0, padx=20, pady=20, sticky="ew")
-                    # Idioma Entry Field
-                    self.cnpjEntry = ctk.CTkEntry(master=self.frameCadastro, placeholder_text="insira o idioma do álbum/single", font=placeholder_botao, width=400)
-                    self.cnpjEntry.grid(row=3, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+                # Idioma Label
+                self.cnpjLabel = ctk.CTkLabel(master=self.frameCadastro, text="Idioma", font=placeholder_botao)
+                self.cnpjLabel.grid(row=3, column=0, padx=20, pady=20, sticky="ew")
+                    
+                # Idioma Entry Field
+                self.cnpjEntry = ctk.CTkEntry(master=self.frameCadastro, placeholder_text="insira o idioma do álbum/single", font=placeholder_botao, width=400)
+                self.cnpjEntry.grid(row=3, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
         
-                    # Descrição Label
-                    self.cnpjLabel = ctk.CTkLabel(master=self.frameCadastro, text="Descrição", font=placeholder_botao)
-                    self.cnpjLabel.grid(row=4, column=0, padx=20, pady=20, sticky="ew")
-                    # Descrição Entry Field
-                    self.cnpjEntry = ctk.CTkEntry(master=self.frameCadastro, placeholder_text="insira a descrição do álbum/single", font=placeholder_botao, width=400)
-                    self.cnpjEntry.grid(row=4, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+                # Descrição Label
+                self.cnpjLabel = ctk.CTkLabel(master=self.frameCadastro, text="Descrição", font=placeholder_botao)
+                self.cnpjLabel.grid(row=4, column=0, padx=20, pady=20, sticky="ew")
+                    
+                # Descrição Entry Field
+                self.cnpjEntry = ctk.CTkEntry(master=self.frameCadastro, placeholder_text="insira a descrição do álbum/single", font=placeholder_botao, width=400)
+                self.cnpjEntry.grid(row=4, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
         
-                    # Descrição capa Label
-                    self.cnpjLabel = ctk.CTkLabel(master=self.frameCadastro, text="Descrição visual de elementos da capa", font=placeholder_botao)
-                    self.cnpjLabel.grid(row=5, column=0, padx=20, pady=20, sticky="ew")
-                    # Descrição caoa Entry Field
-                    self.cnpjEntry = ctk.CTkEntry(master=self.frameCadastro, placeholder_text="insira a descrição visual da capa", font=placeholder_botao, width=400)
-                    self.cnpjEntry.grid(row=5, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+                # Descrição capa Label
+                self.cnpjLabel = ctk.CTkLabel(master=self.frameCadastro, text="Descrição visual de elementos da capa", font=placeholder_botao)
+                self.cnpjLabel.grid(row=5, column=0, padx=20, pady=20, sticky="ew")
+                    
+                # Descrição caoa Entry Field
+                self.cnpjEntry = ctk.CTkEntry(master=self.frameCadastro, placeholder_text="insira a descrição visual da capa", font=placeholder_botao, width=400)
+                self.cnpjEntry.grid(row=5, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
 
-            
+                # botao
+                self.botaoCadastroPessoa = ctk.CTkButton(master=self.frameCadastro,text='Cadastrar', width=250, font=placeholder_botao, command=self.enviaDadosPessoas)
+                self.botaoCadastroPessoa.grid(row=6, column=1, columnspan=3, padx=20, pady=20, sticky="ew") 
+                
+                self.exibeProdutos()
+
+
+        def exibeProdutos(self):
+            # Cria a tabela
+            self.columns = ("CodigoBarras", "Nome", "Lançamento", "Ações")
+            self.table = ttk.Treeview(master=self.frameCadastro, columns=self.columns, show="headings", height=10)
+            for col in self.columns:
+                self.table.heading(col, text=col)
+                self.table.column(col, anchor="center")  # Centraliza o conteúdo das células
+            self.table.grid(row=7, column=0, columnspan=2, padx=30, pady=10, sticky="ew")
+
+            # Aumenta a largura das colunas da tabela
+            self.table.column("CodigoBarras", width=150)  # Ajuste a largura conforme necessário
+            self.table.column("Nome", width=200)  # Ajuste a largura conforme necessário
+            self.table.column("Lançamento", width=150)  # Ajuste a largura conforme necessário
+            self.table.column("Ações", width=100)  # Ajuste a largura conforme necessário
+
+            # Estiliza o cabeçalho da tabela (nomes das colunas)
+            style = ttk.Style()
+            style.configure("Treeview.Heading", font=("Arial", 10, "bold"), foreground="blue")  # Define fonte em negrito e cor azul
+
+            # Cria uma instância do banco
+            banco = Banco()
+            bd = banco.conexao.cursor()
+
+            try:
+                # Remova os espaços em branco do CNPJ
+                cnpj = self.cnpj[0].strip()
+                # Execute a consulta SQL para obter os dados dos produtos cadastrados
+                bd.execute("SELECT \"CodigoBarras\", \"Nome\", \"DataLancamento\" FROM public.\"Produto\" WHERE \"fk_Usuario_Cnpj\" = %s", (cnpj,))
+                dados_produtos = bd.fetchall()
+                
+                # Limpe a tabela antes de preencher novamente
+                for item in self.table.get_children():
+                    self.table.delete(item)
+
+    
+                # Preencha a tabela com os dados obtidos da consulta 
+                for produto in dados_produtos:
+                    codigo_barras, nome, lancamento = produto
+                    self.table.insert("", "end", values=(codigo_barras, nome, lancamento, ""))
+                    button = ctk.CTkButton(self.table, text="Ação", command=Faixas(app, codigo_barras))
+                    self.table.window_create("", window=button, padx=10, pady=5)
+
+            except (Exception, psycopg2.DatabaseError) as error:
+                print(error)
+                # Exiba uma mensagem de erro se houver algum problema com a consulta
+
+            finally:
+                if banco is not None:
+                    banco.conexao.close()
+
+
         def editaProdutos(self):
             telaEditarProduto = ctk.CTkToplevel(app)
             telaEditarProduto.title("Editar produto")
-            telaEditarProduto.geometry("700x300")
+            telaEditarProduto.geometry("800x800")
             
             self.label = ctk.CTkLabel(telaEditarProduto,text="Preencha os campos abaixo:", font=title_font)
             self.label.pack(pady=10)
@@ -227,7 +351,7 @@ class Produto:
         def deletaProduto(self):
             telaDeletarProduto = ctk.CTkToplevel(app)
             telaDeletarProduto.title("Deletar produto")
-            telaDeletarProduto.geometry("700x300")
+            telaDeletarProduto.geometry("800x800")
 
             self.label = ctk.CTkLabel(telaDeletarProduto,text="Preencha os campos abaixo:", font=title_font)
             self.label.pack(pady=10)
@@ -248,6 +372,7 @@ class Produto:
             self.botaoProcurarProduto = ctk.CTkButton(master=self.frameDeletaProduto,text='Procurar produto', width=250, font=placeholder_botao, command=self.enviaCodigoBarrasDelete)
             self.botaoProcurarProduto.grid(row=5, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
         
+
         def enviaCodigoBarrasDelete(self):
             # conectando banco de dados
             banco = Banco()
@@ -266,10 +391,11 @@ class Produto:
             else:
                 tkmb.showerror(title="Erro", message="Não há nenhum produto com esse código de barras!")
 
+
         def mostrarProdutoDelete(self):
             telaMostrarProdutoDelete = ctk.CTkToplevel(app)
             telaMostrarProdutoDelete.title("Produto encontrado")
-            telaMostrarProdutoDelete.geometry("700x200")
+            telaMostrarProdutoDelete.geometry("800x800")
 
             self.label = ctk.CTkLabel(telaMostrarProdutoDelete,text="Produto encontrado! Certeza que deseja excluir?", font=title_font)
             self.label.pack(pady=10)
@@ -281,6 +407,7 @@ class Produto:
             #botão para para deletar produto
             self.botaoDeletarProduto = ctk.CTkButton(master=self.frameDeletaProduto,text='Deletar produto', width=250, font=placeholder_botao, command=self.deletarProduto)
             self.botaoDeletarProduto.grid(row=1, column=3, columnspan=3, padx=10, pady=20, sticky="ew")           
+
 
         def deletarProduto(self):
             try:
@@ -303,11 +430,10 @@ class Produto:
                     tkmb.showerror(title="Erro", message="Ocorreu um erro ao deletar o produto: " + str(e))
 
 
-
         def visualizarRelatorios(self):
             telaRelatorios = ctk.CTkToplevel(app)
             telaRelatorios.title("Relatórios")
-            telaRelatorios.geometry("700x300")
+            telaRelatorios.geometry("800x800")
 
             self.label = ctk.CTkLabel(telaRelatorios,text="Consultar dados", font=title_font)
             self.label.pack(pady=10)
@@ -323,11 +449,10 @@ class Produto:
             self.botaoArtista.pack(pady=10,padx=10)
 
         
-
         def consultarFaixa(self):
             telaConsultarFaixa = ctk.CTkToplevel(app)
             telaConsultarFaixa.title("Consultar número de reproduções de uma faixa")
-            telaConsultarFaixa.geometry("700x300")
+            telaConsultarFaixa.geometry("800x800")
 
             self.label = ctk.CTkLabel(telaConsultarFaixa,text="Consultar número de reproduções de uma faixa", font=title_font)
             self.label.pack(pady=10)
@@ -347,6 +472,7 @@ class Produto:
             #botão para procurar as faixas
             self.botaoProcurarFaixa = ctk.CTkButton(master=self.frameConsultarFaixa,text='Procurar faixa', width=250, font=placeholder_botao, command=self.enviarIsrc)
             self.botaoProcurarFaixa.grid(row=5, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+
 
         def enviarIsrc(self):
             # conectando banco de dados
@@ -368,10 +494,11 @@ class Produto:
             else:
                 tkmb.showerror(title="Erro", message="Não há nenhuma faixa com esse ISRC!")
 
+
         def mostrarFaixa(self, numeroReproducoes):
             telaMostrarFaixa = ctk.CTkToplevel(app)
             telaMostrarFaixa.title("Faixa encontrada")
-            telaMostrarFaixa.geometry("700x200")
+            telaMostrarFaixa.geometry("800x800")
 
             #mostrar o resultado da busca
             self.label = ctk.CTkLabel(telaMostrarFaixa,text="Faixa encontrada! Número de reproduções: " + str(numeroReproducoes), font=title_font)
@@ -380,7 +507,7 @@ class Produto:
         def consultarAlbum(self):
             telaConsultarAlbum = ctk.CTkToplevel(app)
             telaConsultarAlbum.title("Consultar número de reproduções de um album")
-            telaConsultarAlbum.geometry("700x300")
+            telaConsultarAlbum.geometry("800x800")
 
             self.label = ctk.CTkLabel(telaConsultarAlbum,text="Consultar número de reproduções de um album", font=title_font)
             self.label.pack(pady=10)
@@ -422,19 +549,21 @@ class Produto:
             else:
                 tkmb.showerror(title="Erro", message="Não há nenhum album com esse código de barras!")
         
+
         def mostrarAlbum(self, numeroReproducoes):
             telaMostrarAlbum = ctk.CTkToplevel(app)
             telaMostrarAlbum.title("Album encontrado")
-            telaMostrarAlbum.geometry("700x200")
+            telaMostrarAlbum.geometry("800x800")
 
             #mostrar o resultado da busca
             self.label = ctk.CTkLabel(telaMostrarAlbum,text="Album encontrado! Número de reproduções: " + str(numeroReproducoes), font=title_font)
             self.label.pack(pady=10)
         
+
         def consultarArtista(self):
             telaConsultarArtista = ctk.CTkToplevel(app)
             telaConsultarArtista.title("Consultar número de reproduções de um artista")
-            telaConsultarArtista.geometry("700x300")
+            telaConsultarArtista.geometry("800x800")
 
             self.label = ctk.CTkLabel(telaConsultarArtista,text="Consultar número de reproduções de um artista", font=title_font)
             self.label.pack(pady=10)
@@ -454,6 +583,7 @@ class Produto:
             #botão para procurar os produtos
             self.botaoProcurarArtista = ctk.CTkButton(master=self.frameConsultarArtista,text='Procurar artista', width=250, font=placeholder_botao, command=self.enviarCpfArtista)
             self.botaoProcurarArtista.grid(row=5, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+
 
         def enviarCpfArtista(self):
             # conectando banco de dados
@@ -480,7 +610,7 @@ class Produto:
         def mostrarArtista(self, numeroReproducoes):
             telaMostrarArtista = ctk.CTkToplevel(app)
             telaMostrarArtista.title("Artista encontrado")
-            telaMostrarArtista.geometry("700x200")
+            telaMostrarArtista.geometry("800x800")
 
             #mostrar o resultado da busca
             self.label = ctk.CTkLabel(telaMostrarArtista,text="Artista encontrado! Número de reproduções: " + str(numeroReproducoes), font=title_font)
@@ -489,14 +619,15 @@ class Produto:
 
         def index(self):
             index = ctk.CTkToplevel(app)
-            index.geometry("1000x1000")
+            index.geometry("800x800")
             index.title("Tela inicial")
 
             # Criar a imagem
-            self.my_image = Image.open("interface/image/logo.png")
+            self.my_image = Image.open("image/logo.png")
             self.my_image = ImageTk.PhotoImage(self.my_image.resize((150, 150)))  # Resize the image
             self.image_label = ctk.CTkLabel(index, image=self.my_image, text="")
             self.image_label.grid(row=0, column=0, padx=20, pady=20, sticky="w")
+
 
             # Criar o rótulo
             self.label = ctk.CTkLabel(index, text="Distribuidora digital de música", font=title_font)
@@ -505,7 +636,7 @@ class Produto:
             self.frameIndex = ctk.CTkFrame(master=index)
             self.frameIndex.grid(row=1, column=0, columnspan=2, padx=40, pady=20, sticky="ew")
             # Criar os botões
-            self.botaoArtista = ctk.CTkButton(master=self.frameIndex, text='Cadastrar artistas', width=250, font=placeholder_botao, command=self.cadastroPessoas)
+            self.botaoArtista = ctk.CTkButton(master=self.frameIndex, text='Cadastrar pessoas', width=250, font=placeholder_botao, command=self.cadastroPessoas)
             self.botaoArtista.grid(row=0, column=0, padx=20, pady=20, sticky="ew")
             self.botaoRelatorio = ctk.CTkButton(master=self.frameIndex, text='Relatorios', width=250, font=placeholder_botao, command=self.visualizarRelatorios)
             self.botaoRelatorio.grid(row=0, column=1, padx=20, pady=20, sticky="ew")
@@ -515,18 +646,16 @@ class Produto:
             self.frameIndex2.grid(row=2, column=0, columnspan=2, padx=40, pady=20, sticky="ew")
 
             # Criar o botão para cadastrar produto
-            self.btn_cadastraProduto = ctk.CTkButton(master=self.frameIndex2, text="Cadastrar produto", command=self.cadastroProdutos)
+            self.btn_cadastraProduto = ctk.CTkButton(master=self.frameIndex2, text="Cadastrar produto", width=175, font=placeholder_botao, command=self.cadastroProdutos)
             self.btn_cadastraProduto.grid(row=1, column=0, padx=30, pady=10, sticky="ew")
 
             # Criar o botão para editar produto
-            self.btn_editaProduto = ctk.CTkButton(master=self.frameIndex2, text="Editar produto", command=self.editaProdutos)
+            self.btn_editaProduto = ctk.CTkButton(master=self.frameIndex2, text="Editar produto", width=175, font=placeholder_botao, command=self.editaProdutos)
             self.btn_editaProduto.grid(row=1, column=1, padx=30, pady=10, sticky="ew")
 
             # Criar o botão para deletar produtos
-            self.btn_deletaProduto = ctk.CTkButton(master=self.frameIndex2, text="Deletar produto", command=self.deletaProduto)
-            self.btn_deletaProduto.grid(row=1, column=1, padx=30, pady=10, sticky="ew")
-
-           
+            self.btn_deletaProduto = ctk.CTkButton(master=self.frameIndex2, text="Deletar produto", width=175, font=placeholder_botao, command=self.deletaProduto)
+            self.btn_deletaProduto.grid(row=1, column=2, padx=30, pady=10, sticky="ew")
 
             
 class Usuario:
@@ -563,9 +692,8 @@ class Usuario:
         else:
             tkmb.showerror(title="Falha no login", message="usuário e senha incorretos")
             
-
     def telaLogin(self):
-            app.geometry("700x700")
+            app.geometry("800x800")
             self.app.title("Login distribuidora musical")
             self.label = ctk.CTkLabel(app,text="Seja bem vindo a sua distribuidora de música digital!", font=title_font)
             self.label.pack(pady=20)
@@ -573,7 +701,7 @@ class Usuario:
             self.frame = ctk.CTkFrame(master=app)
             self.frame.pack(pady=20, padx=40, fill='both', expand=True)
 
-            self.my_image = Image.open("interface/image/logo.png")
+            self.my_image = Image.open("image/logo.png")
             self.my_image = ImageTk.PhotoImage(self.my_image.resize((200, 200)))  # Resize the image
             self.image_label = ctk.CTkLabel(master=self.frame, image=self.my_image, text="")
             self.image_label.pack(pady=0, padx=0)
@@ -619,13 +747,13 @@ class Usuario:
     def cadastro(self):
             telaCadastro = ctk.CTkToplevel(app)
             telaCadastro.title("Tela Cadastro")
-            telaCadastro.geometry("700x700")
+            telaCadastro.geometry("800x800")
 
             self.label = ctk.CTkLabel(telaCadastro,text="Cadastre seus dados:", font=title_font)
             self.label.pack(pady=20)
             #frame
             self.frameCadastro = ctk.CTkFrame(master=telaCadastro)
-            self.frameCadastro.pack(pady=20, padx=40, fill='both', expand=True)
+            self.frameCadastro.pack(pady=20, padx=40, fill='both', anchor=tk.CENTER, expand=True)
 
             # Nome Label
             self.nameLabel = ctk.CTkLabel(master=self.frameCadastro, text="Nome", font=placeholder_botao)
@@ -675,6 +803,4 @@ if __name__ == "__main__":
 
 #inicia aplicação tkinter
 app.mainloop()
-telaCadastro.mainloop()
-telaCadastroPessoas.mainloop()
 #testa
