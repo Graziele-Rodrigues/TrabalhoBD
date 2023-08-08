@@ -161,10 +161,68 @@ class Produto:
              pass
         
         def cadastroProdutos(self):
-             pass
+                    telaCadastrarProduto = ctk.CTkToplevel(app)
+                    telaCadastrarProduto.title("Cadastrar produto")
+                    telaCadastrarProduto.geometry("700x700")
+            
+                    self.label = ctk.CTkLabel(telaCadastrarProduto,text="Cadastre o produto:", font=title_font)
+                    self.label.pack(pady=10)
         
+                    #frame
+                    self.frameCadastro = ctk.CTkFrame(master=telaCadastro)
+                    self.frameCadastro.pack(pady=20, padx=40, fill='both', expand=True)
+        
+                    # Nome Label
+                    self.nameLabel = ctk.CTkLabel(master=self.frameCadastro, text="Nome", font=placeholder_botao)
+                    self.nameLabel.grid(row=0, column=0, padx=20, pady=20, sticky="ew")
+                    # Nome Entry Field
+                    self.nameEntry = ctk.CTkEntry(master=self.frameCadastro, placeholder_text="nome do álbum/single", font=placeholder_botao, width=400)
+                    self.nameEntry.grid(row=0, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+        
+                    # Código de barras Label
+                    self.emailLabel = ctk.CTkLabel(master=self.frameCadastro, text="Código de barras", font=placeholder_botao)
+                    self.emailLabel.grid(row=1, column=0, padx=20, pady=20, sticky="ew")
+                    # Código de barra Entry Field
+                    self.emailEntry = ctk.CTkEntry(master=self.frameCadastro, placeholder_text="insira o codigo barras", font=placeholder_botao, width=400)
+                    self.emailEntry.grid(row=1, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+        
+                    # Data de lançamento Label
+                    self.senhaLabel = ctk.CTkLabel(master=self.frameCadastro, text="Data de lançamento", font=placeholder_botao)
+                    self.senhaLabel.grid(row=2, column=0, padx=20, pady=20, sticky="ew")
+                     # Data de lançamento Entry Field
+                    self.senhaEntry = ctk.CTkEntry(master=self.frameCadastro, placeholder_text="insira a data", font=placeholder_botao, width=400)
+                    self.senhaEntry.grid(row=2, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+        
+                    # Idioma Label
+                    self.cnpjLabel = ctk.CTkLabel(master=self.frameCadastro, text="Idioma", font=placeholder_botao)
+                    self.cnpjLabel.grid(row=3, column=0, padx=20, pady=20, sticky="ew")
+                    # Idioma Entry Field
+                    self.cnpjEntry = ctk.CTkEntry(master=self.frameCadastro, placeholder_text="insira o idioma do álbum/single", font=placeholder_botao, width=400)
+                    self.cnpjEntry.grid(row=3, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+        
+                    # Descrição Label
+                    self.cnpjLabel = ctk.CTkLabel(master=self.frameCadastro, text="Descrição", font=placeholder_botao)
+                    self.cnpjLabel.grid(row=4, column=0, padx=20, pady=20, sticky="ew")
+                    # Descrição Entry Field
+                    self.cnpjEntry = ctk.CTkEntry(master=self.frameCadastro, placeholder_text="insira a descrição do álbum/single", font=placeholder_botao, width=400)
+                    self.cnpjEntry.grid(row=4, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+        
+                    # Descrição capa Label
+                    self.cnpjLabel = ctk.CTkLabel(master=self.frameCadastro, text="Descrição visual de elementos da capa", font=placeholder_botao)
+                    self.cnpjLabel.grid(row=5, column=0, padx=20, pady=20, sticky="ew")
+                    # Descrição caoa Entry Field
+                    self.cnpjEntry = ctk.CTkEntry(master=self.frameCadastro, placeholder_text="insira a descrição visual da capa", font=placeholder_botao, width=400)
+                    self.cnpjEntry.grid(row=5, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+
+            
         def editaProdutos(self):
-             pass
+            telaEditarProduto = ctk.CTkToplevel(app)
+            telaEditarProduto.title("Editar produto")
+            telaEditarProduto.geometry("700x300")
+            
+            self.label = ctk.CTkLabel(telaEditarProduto,text="Preencha os campos abaixo:", font=title_font)
+            self.label.pack(pady=10)
+
         
         def deletaProduto(self):
             telaDeletarProduto = ctk.CTkToplevel(app)
