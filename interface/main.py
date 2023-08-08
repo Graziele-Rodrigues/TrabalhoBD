@@ -268,10 +268,10 @@ class Produto:
 
         def consultarFaixa(self):
             telaConsultarFaixa = ctk.CTkToplevel(app)
-            telaConsultarFaixa.title("Consultar nímero de reproduções de uma faixa")
+            telaConsultarFaixa.title("Consultar número de reproduções de uma faixa")
             telaConsultarFaixa.geometry("700x300")
 
-            self.label = ctk.CTkLabel(telaConsultarFaixa,text="Consultar nímero de reproduções de uma faixa", font=title_font)
+            self.label = ctk.CTkLabel(telaConsultarFaixa,text="Consultar número de reproduções de uma faixa", font=title_font)
             self.label.pack(pady=10)
 
             #frame
@@ -321,10 +321,10 @@ class Produto:
 
         def consultarAlbum(self):
             telaConsultarAlbum = ctk.CTkToplevel(app)
-            telaConsultarAlbum.title("Consultar nímero de reproduções de um album")
+            telaConsultarAlbum.title("Consultar número de reproduções de um album")
             telaConsultarAlbum.geometry("700x300")
 
-            self.label = ctk.CTkLabel(telaConsultarAlbum,text="Consultar nímero de reproduções de um album", font=title_font)
+            self.label = ctk.CTkLabel(telaConsultarAlbum,text="Consultar número de reproduções de um album", font=title_font)
             self.label.pack(pady=10)
 
             #frame
@@ -375,10 +375,10 @@ class Produto:
         
         def consultarArtista(self):
             telaConsultarArtista = ctk.CTkToplevel(app)
-            telaConsultarArtista.title("Consultar nímero de reproduções de um artista")
+            telaConsultarArtista.title("Consultar número de reproduções de um artista")
             telaConsultarArtista.geometry("700x300")
 
-            self.label = ctk.CTkLabel(telaConsultarArtista,text="Consultar nímero de reproduções de um artista", font=title_font)
+            self.label = ctk.CTkLabel(telaConsultarArtista,text="Consultar número de reproduções de um artista", font=title_font)
             self.label.pack(pady=10)
 
             #frame
