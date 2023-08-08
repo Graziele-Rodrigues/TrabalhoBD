@@ -619,3 +619,4 @@ if __name__ == "__main__":
 app.mainloop()
 telaCadastro.mainloop()
 telaCadastroPessoas.mainloop()
+#testa
