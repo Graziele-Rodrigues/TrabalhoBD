@@ -414,8 +414,8 @@ class Produto:
             bd = banco.conexao.cursor()
 
             # realiza busca
-            buscaCodigoBarras = """ SELECT "CodigoBarras" FROM public."Produto" where "CodigoBarras" = %s; """
-            bd.execute(buscaCodigoBarras, (self.codigoBarrasEntry.get(),))
+            buscaCodigoBarras = """ SELECT "CodigoBarras" FROM public."Produto" where "CodigoBarras" = %s and "fk_Usuario_Cnpj" = %s; """
+            bd.execute(buscaCodigoBarras, (self.codigoBarrasEntry.get(), self.cnpj))
             self.buscaCodigoBarras = bd.fetchone()
 
             # fecha comunicação com banco
@@ -449,10 +449,10 @@ class Produto:
                 # conectando banco de dados
                 banco = Banco()
                 bd = banco.conexao.cursor()
-
+                
                 # realiza busca
-                deleteProduto = """ DELETE FROM public."Produto" where "CodigoBarras" = %s; """
-                bd.execute(deleteProduto, (self.codigoBarrasEntry.get(),))
+                deleteProduto = """ DELETE FROM public."Produto" where "CodigoBarras" = %s and "fk_Usuario_Cnpj" = %s; """
+                bd.execute(deleteProduto, (self.codigoBarrasEntry.get(), self.cnpj,))
                 banco.conexao.commit()
 
                 # fecha comunicação com banco
@@ -473,7 +473,6 @@ class Produto:
             self.label = ctk.CTkLabel(telaRelatorios,text="Consultar dados", font=title_font)
             self.label.pack(pady=10)
 
-            #faça um botão para consultar faixa, artista e album
             self.botaoFaixa = ctk.CTkButton(master=telaRelatorios,text='Consultar faixa', width=250, font=placeholder_botao, command=self.consultarFaixa)
             self.botaoFaixa.pack(pady=10,padx=10)
 
@@ -486,10 +485,10 @@ class Produto:
         
         def consultarFaixa(self):
             telaConsultarFaixa = ctk.CTkToplevel(app)
-            telaConsultarFaixa.title("Consultar número de reproduções de uma faixa")
+            telaConsultarFaixa.title("Consultar reproduções de uma faixa")
             telaConsultarFaixa.geometry("800x800")
 
-            self.label = ctk.CTkLabel(telaConsultarFaixa,text="Consultar número de reproduções de uma faixa", font=title_font)
+            self.label = ctk.CTkLabel(telaConsultarFaixa,text="Consultar reproduções de uma faixa", font=title_font)
             self.label.pack(pady=10)
 
             #frame
@@ -515,22 +514,30 @@ class Produto:
             bd = banco.conexao.cursor()
 
             # realiza busca
-            buscaIsrc = """ SELECT "QuantidadeReproducao" FROM public."Reproduzida" where "fk_FaixaMusical_Single_ISRC" = %s; """
+            buscaIsrc = """ SELECT SUM(DISTINCT "QuantidadeReproducao") FROM public."Reproduzida" where "fk_FaixaMusical_Single_ISRC" = %s; """
             bd.execute(buscaIsrc, (self.isrcEntry.get(),))
             self.buscaIsrc = bd.fetchone()
 
+            #realiza segunda busca 
+            buscaReproducoes = """ SELECT P."Nome", R."QuantidadeReproducao", R."QuantidadeReproducao" * P."ValorPagoReproducao" as valor_reproducao
+                                    FROM public."Reproduzida" as R
+                                    JOIN public."PlataformaDigital" as P ON R."fk_PlataformaDigital_cnpj" = P."CNPJ"
+                                    WHERE R."fk_FaixaMusical_Single_ISRC" = %s; """
+            bd.execute(buscaReproducoes, (self.isrcEntry.get(),))
+            self.buscaReproducoes = bd.fetchall()
+            
             numeroReproducoes = self.buscaIsrc[0]
 
             # fecha comunicação com banco
             bd.close()
 
             if self.buscaIsrc:
-                self.mostrarFaixa(numeroReproducoes)
+                self.mostrarFaixa(numeroReproducoes, self.buscaReproducoes)
             else:
                 tkmb.showerror(title="Erro", message="Não há nenhuma faixa com esse ISRC!")
 
 
-        def mostrarFaixa(self, numeroReproducoes):
+        def mostrarFaixa(self, numeroReproducoes, buscaReproducoes):
             telaMostrarFaixa = ctk.CTkToplevel(app)
             telaMostrarFaixa.title("Faixa encontrada")
             telaMostrarFaixa.geometry("800x800")
@@ -538,6 +545,11 @@ class Produto:
             #mostrar o resultado da busca
             self.label = ctk.CTkLabel(telaMostrarFaixa,text="Faixa encontrada! Número de reproduções: " + str(numeroReproducoes), font=title_font)
             self.label.pack(pady=10)
+
+            for i in range(len(buscaReproducoes)):
+                self.label = ctk.CTkLabel(telaMostrarFaixa,text="Plataforma: '" + str(buscaReproducoes[i][0]) + "' - Número de reproduções: " + str(buscaReproducoes[i][1]) + " - Valor: R$" + str(buscaReproducoes[i][2]), font=title_font)
+                self.label.pack(pady=10)
+
 
         def consultarAlbum(self):
             telaConsultarAlbum = ctk.CTkToplevel(app)
@@ -570,9 +582,18 @@ class Produto:
             bd = banco.conexao.cursor()
 
             # realiza busca
-            buscaCodigoBarras = """ SELECT "QuantidadeReproducao" FROM public."Reproduzida" where "fk_FaixaMusical_Single_fk_Produto_CodigoBarras" = %s; """
+            buscaCodigoBarras = """ SELECT SUM(DISTINCT "QuantidadeReproducao") FROM public."Reproduzida" where "fk_FaixaMusical_Single_fk_Produto_CodigoBarras" = %s; """
             bd.execute(buscaCodigoBarras, (self.codigoBarrasEntry.get(),))
             self.buscaCodigoBarras = bd.fetchone()
+
+            #realiza segunda busca 
+            buscaReproducoes = """ SELECT P."Nome", R."QuantidadeReproducao", R."QuantidadeReproducao" * P."ValorPagoReproducao" as valor_reproducao
+                                    FROM public."Reproduzida" as R
+                                    JOIN public."PlataformaDigital" as P ON R."fk_PlataformaDigital_cnpj" = P."CNPJ"
+                                    WHERE R."fk_FaixaMusical_Single_fk_Produto_CodigoBarras" = %s; """
+            bd.execute(buscaReproducoes, (self.codigoBarrasEntry.get(),))
+            self.buscaReproducoes = bd.fetchall()
+            
 
             numeroReproducoes = self.buscaCodigoBarras[0]
 
@@ -580,12 +601,12 @@ class Produto:
             bd.close()
 
             if self.buscaCodigoBarras:
-                self.mostrarAlbum(numeroReproducoes)
+                self.mostrarAlbum(numeroReproducoes, self.buscaReproducoes)
             else:
                 tkmb.showerror(title="Erro", message="Não há nenhum album com esse código de barras!")
         
 
-        def mostrarAlbum(self, numeroReproducoes):
+        def mostrarAlbum(self, numeroReproducoes, buscaReproducoes):
             telaMostrarAlbum = ctk.CTkToplevel(app)
             telaMostrarAlbum.title("Album encontrado")
             telaMostrarAlbum.geometry("800x800")
@@ -593,6 +614,10 @@ class Produto:
             #mostrar o resultado da busca
             self.label = ctk.CTkLabel(telaMostrarAlbum,text="Album encontrado! Número de reproduções: " + str(numeroReproducoes), font=title_font)
             self.label.pack(pady=10)
+
+            for i in range(len(buscaReproducoes)):
+                self.label = ctk.CTkLabel(telaMostrarAlbum,text="Plataforma: '" + str(buscaReproducoes[i][0]) + "' - Número de reproduções: " + str(buscaReproducoes[i][1]) + " - Valor: R$" + str(buscaReproducoes[i][2]), font=title_font)
+                self.label.pack(pady=10)
         
 
         def consultarArtista(self):
@@ -658,10 +683,10 @@ class Produto:
             index.title("Tela inicial")
 
             # Criar a imagem
-            self.my_image = Image.open("image/logo.png")
-            self.my_image = ImageTk.PhotoImage(self.my_image.resize((150, 150)))  # Resize the image
-            self.image_label = ctk.CTkLabel(index, image=self.my_image, text="")
-            self.image_label.grid(row=0, column=0, padx=20, pady=20, sticky="w")
+            # self.my_image = Image.open("image/logo.png")
+            # self.my_image = ImageTk.PhotoImage(self.my_image.resize((150, 150)))  # Resize the image
+            # self.image_label = ctk.CTkLabel(index, image=self.my_image, text="")
+            # self.image_label.grid(row=0, column=0, padx=20, pady=20, sticky="w")
 
 
             # Criar o rótulo
@@ -736,10 +761,10 @@ class Usuario:
             self.frame = ctk.CTkFrame(master=app)
             self.frame.pack(pady=20, padx=40, fill='both', expand=True)
 
-            self.my_image = Image.open("image/logo.png")
-            self.my_image = ImageTk.PhotoImage(self.my_image.resize((200, 200)))  # Resize the image
-            self.image_label = ctk.CTkLabel(master=self.frame, image=self.my_image, text="")
-            self.image_label.pack(pady=0, padx=0)
+            # self.my_image = Image.open("image/logo.png")
+            # self.my_image = ImageTk.PhotoImage(self.my_image.resize((200, 200)))  # Resize the image
+            # self.image_label = ctk.CTkLabel(master=self.frame, image=self.my_image, text="")
+            # self.image_label.pack(pady=0, padx=0)
 
             self.label = ctk.CTkLabel(master=self.frame, text='')
             self.label.pack(pady=12, padx=10)
