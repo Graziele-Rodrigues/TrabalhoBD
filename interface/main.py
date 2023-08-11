@@ -483,8 +483,109 @@ class Produto:
             
             self.label = ctk.CTkLabel(telaEditarProduto,text="Preencha os campos abaixo:", font=title_font)
             self.label.pack(pady=10)
+           
+            #frame
+            self.frameEditarProduto = ctk.CTkFrame(master=telaEditarProduto)
+            self.frameEditarProduto.pack(pady=20, padx=40, fill='both', anchor=tk.CENTER, expand=True)
+    
+            # Código de barras Label
+            self.codbarrasLabel = ctk.CTkLabel(master=self.frameEditarProduto, text="Código de barras", font=placeholder_botao)
+            self.codbarrasLabel.grid(row=0, column=0, padx=20, pady=20, sticky="ew")
+            
+            # Código de barra Entry Field
+            self.codbarrasEntry = ctk.CTkEntry(master=self.frameEditarProduto, placeholder_text="insira o codigo barras", font=placeholder_botao, width=400)
+            self.codbarrasEntry.grid(row=0, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+            
+            # Nome Label
+            self.nameProdLabel = ctk.CTkLabel(master=self.frameEditarProduto, text="Nome", font=placeholder_botao)
+            self.nameProdLabel.grid(row=1, column=0, padx=20, pady=20, sticky="ew")
+            
+            # Nome Entry Field
+            self.nameProdEntry = ctk.CTkEntry(master=self.frameEditarProduto, placeholder_text="nome do álbum/single", font=placeholder_botao, width=400)
+            self.nameProdEntry.grid(row=1, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+    
+            # Descrição capa Label
+            self.capaLabel = ctk.CTkLabel(master=self.frameEditarProduto, text="Descrição visual de elementos da capa", font=placeholder_botao)
+            self.capaLabel.grid(row=2, column=0, padx=20, pady=20, sticky="ew")
+                
+            # Descrição capa Entry Field
+            self.capaEntry = ctk.CTkEntry(master=self.frameEditarProduto, placeholder_text="insira a descrição visual da capa", font=placeholder_botao, width=400)
+            self.capaEntry.grid(row=2, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
 
-        
+            # Descrição Label
+            self.descricaoLabel = ctk.CTkLabel(master=self.frameEditarProduto, text="Descrição", font=placeholder_botao)
+            self.descricaoLabel.grid(row=3, column=0, padx=20, pady=20, sticky="ew")
+                
+            # Descrição Entry Field
+            self.descricaoEntry = ctk.CTkEntry(master=self.frameEditarProduto, placeholder_text="insira a descrição do álbum/single", font=placeholder_botao, width=400)
+            self.descricaoEntry.grid(row=3, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+            
+            # Data de lançamento Label
+            self.dataLabel = ctk.CTkLabel(master=self.frameEditarProduto, text="Data de lançamento", font=placeholder_botao)
+            self.dataLabel.grid(row=4, column=0, padx=20, pady=20, sticky="ew")
+            
+            # Data de lançamento Entry Field
+            self.dataEntry = ctk.CTkEntry(master=self.frameEditarProduto, placeholder_text="insira a data (AAAA-MM-DD)", font=placeholder_botao, width=400)
+            self.dataEntry.grid(row=4, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+    
+            # Idioma Label
+            self.idiomaLabel = ctk.CTkLabel(master=self.frameEditarProduto, text="Idioma", font=placeholder_botao)
+            self.idiomaLabel.grid(row=5, column=0, padx=20, pady=20, sticky="ew")
+                
+            # Idioma Entry Field
+            self.idiomaEntry = ctk.CTkEntry(master=self.frameEditarProduto, placeholder_text="insira o idioma do álbum/single", font=placeholder_botao, width=400)
+            self.idiomaEntry.grid(row=5, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+
+            # cnpj usuario Label
+            self.cnpjusuarioLabel = ctk.CTkLabel(master=self.frameEditarProduto, text="CNPJ do usuario", font=placeholder_botao)
+            self.cnpjusuarioLabel.grid(row=6, column=0, padx=20, pady=20, sticky="ew")
+                
+            # cnpj usuaario Entry Field
+            self.cnpjusuarioEntry = ctk.CTkEntry(master=self.frameEditarProduto, placeholder_text="Insira o cnpj de usuario", font=placeholder_botao, width=400)
+            self.cnpjusuarioEntry.grid(row=6, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+
+            # botao de envio PRODUTO
+            self.botaoCadastroProduto = ctk.CTkButton(master=self.frameEditarProduto,text='Editar PRODUTO', width=150, font=placeholder_botao, command=self.editaDadosProduto)
+            self.botaoCadastroProduto.grid(row=7, column=0, columnspan=3, padx=20, pady=20, sticky="ew") 
+
+            self.exibeProdutos()
+
+        def editaDadosProduto(self):
+            banco = Banco()  # Certifique-se de que a classe Banco esteja corretamente definida
+            bd = banco.conexao.cursor()
+            try:
+                # Verifique se o CNPJ do usuário (fk_Usuario_CNPJ) existe na tabela "Usuario" antes de inserir na tabela "Produto"
+                bd.execute("SELECT COUNT(*) FROM public.\"Usuario\" WHERE \"CNPJ\" = %s", (self.cnpjusuarioEntry.get(),))
+                count = bd.fetchone()[0]
+
+                if count == 0:
+                    tkmb.showerror(title="Erro", message="O CNPJ do usuário não existe na tabela 'Usuario'.")
+                    return
+
+                # Converter a data para um objeto date
+                try:
+                    dataEntry = date.fromisoformat(self.dataEntry.get())
+                except ValueError as error:
+                    print(error)
+                    tkmb.showerror(title="Erro", message="Data com formato errado.")
+                    return
+
+                sql = """UPDATE public."Produto" SET CodigoBarras = %s, SET Nome = %s, SET Capa = %s, SET Descricao = %s, SET Idioma = %s, SET DataLancamento = %s WHERE fk_Usuario_CNPJ = %s"""  
+                bd.execute(sql, (self.codbarrasEntry.get(), self.nameProdEntry.get(), self.capaEntry.get(), self.descricaoEntry.get(), self.idiomaEntry.get(), dataEntry, self.cnpjusuarioEntry.get()))
+                
+                banco.conexao.commit()  # Commit as alterações no banco de dados
+                bd.close()  # Feche a comunicação com o banco de dados
+
+                tkmb.showinfo(title="Cadastrado Sucesso", message="Cadastro realizado com sucesso!")
+            
+            except (Exception, psycopg2.DatabaseError) as error:
+                print(error)
+                # Exiba uma mensagem de erro se houver algum problema com a inserção
+                tkmb.showerror(title="Erro", message="Ocorreu um erro ao cadastrar o produto.")
+
+            finally:
+                if banco is not None:
+                    banco.conexao.close() 
         def deletaProduto(self):
             telaDeletarProduto = ctk.CTkToplevel(app)
             telaDeletarProduto.title("Deletar produto")
