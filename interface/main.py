@@ -48,6 +48,7 @@ class Faixas:
             generos = bd.fetchall()
             bd.close() 
             return generos 
+        
 
         def escolheAlbumSingle(self):
             telaCadastrarProd = ctk.CTkToplevel(app)
@@ -152,11 +153,11 @@ class Faixas:
 
             # Produtor Label
             self.produtorLabel = ctk.CTkLabel(master=self.frameCadastroSingle, text="Produtor Musical", font=placeholder_botao)
-            self.produtorLabel.grid(row=7, column=0, padx=20, pady=20, sticky="ew")
+            self.produtorLabel.grid(row=6, column=0, padx=20, pady=20, sticky="ew")
 
             # Produtor Label
             self.produtor = ctk.CTkComboBox(master=self.frameCadastroSingle, values=pessoas_list)
-            self.produtor.grid(row=7, column=1, padx=20, pady=20, sticky="ew")
+            self.produtor.grid(row=6, column=1, padx=20, pady=20, sticky="ew")
             self.produtor.set(pessoas_list[0])  # Defina o valor padrão
 
             # botao
@@ -451,6 +452,16 @@ class Produto:
                     if banco is not None:
                         banco.conexao.close()
 
+        def get_distribuidora(self):
+            # conectando banco de dados
+            banco = Banco()
+            bd = banco.conexao.cursor()
+            buscaDistribuidora = """ SELECT "CNPJ", "Nome" FROM "PlataformaDigital"; """
+            bd.execute(buscaDistribuidora)
+            distribuidoras = bd.fetchall()
+            bd.close() 
+            return distribuidoras
+
         def cadastroProdutos(self):
                 telaCadastrarProduto = ctk.CTkToplevel(app)
                 telaCadastrarProduto.title("Cadastrar produto")
@@ -511,9 +522,23 @@ class Produto:
                 self.idiomaEntry = ctk.CTkEntry(master=self.frameCadastroProd, placeholder_text="insira o idioma do álbum/single", font=placeholder_botao, width=400)
                 self.idiomaEntry.grid(row=5, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
 
+                #Distribuidora 
+
+                distribuidoras = self.get_distribuidora()
+                distribuidoras_list = [f"{distribuidora[0]} - {distribuidora[1]}" for distribuidora in distribuidoras]  # Extrair pessoas
+                #crie uma listBox para a distribuidora com select multiple
+                self.distribuidoraLabel = ctk.CTkLabel(master=self.frameCadastroProd, text="Distribuidora", font=placeholder_botao)
+                self.distribuidoraLabel.grid(row=6, column=0, padx=20, pady=20, sticky="ew")
+
+                self.distribuidora = Listbox(master=self.frameCadastroProd, selectmode=MULTIPLE, width=50, height=5)
+                self.distribuidora.grid(row=6, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+                for distribuidora in distribuidoras_list:
+                    self.distribuidora.insert(END, distribuidora)
+                self.distribuidora.select_set(0, END)  # Defina o valor padrão
+
                 # botao de envio PRODUTO
                 self.botaoCadastroProduto = ctk.CTkButton(master=self.frameCadastroProd,text='Cadastrar PRODUTO', width=150, font=placeholder_botao, command=self.enviaDadosProduto)
-                self.botaoCadastroProduto.grid(row=6, column=0, columnspan=3, padx=20, pady=20, sticky="ew") 
+                self.botaoCadastroProduto.grid(row=7, column=0, columnspan=3, padx=20, pady=20, sticky="ew") 
                 
         
         def enviaDadosProduto(self):
@@ -538,6 +563,9 @@ class Produto:
                 sql = """INSERT INTO public."Produto"("CodigoBarras", "Nome", "Capa", "Descricao", "Idioma", "DataLancamento", "fk_Usuario_Cnpj") VALUES(%s,%s,%s,%s,%s,%s,%s)"""  
                 bd.execute(sql, (self.codbarrasEntry.get(), self.nameProdEntry.get(), self.capaEntry.get(), self.descricaoEntry.get(), self.idiomaEntry.get(), self.dataEntry.get(), self.cnpj,))
                 
+                distribuidoras = self.distribuidora.curselection()
+                for distribuidora in distribuidoras:
+                    bd.execute("INSERT INTO public.\"Distribuido\"(\"fk_PlataformaDigital_cnpj\", \"fk_Produto_CodigoBarras\") VALUES(%s,%s)", (self.distribuidora.get(distribuidora).split(" - ")[0],self.codbarrasEntry.get(),))
                 banco.conexao.commit()  # Commit as alterações no banco de dados
                 bd.close()  # Feche a comunicação com o banco de dados
                 tkmb.showinfo(title="Cadastrado Sucesso", message="Cadastro realizado com sucesso!")
