@@ -1,21 +1,31 @@
 # Distribuidora digital de música
 
-Sistema para cadastro de produtos musicais a serem distribuídos pela distribuidora.
+Sistema para cadastro de produtos musicais a serem distribuídos. O usuário da nossa plataforma são produtores fonográficos, ou seja, quem detém o direito de um produto- album musical, como por exemplo gravadoras.
 
 ## 🚀 Descrição
 
-1. Tela cadastro de clientes
-    - Dados pessoais e bancários
-    - CPF se pessoa física
-    - CNPJ se pessoa juridica único
-    - Guardar tipo profisional (artista, compositor e produtor).
+1. Tela de cadastro e login usuários. Os usuários são os produtores fonográficos dos álbum. É de responsabilidade deles cadastrar os produtos e também as pessoas que participam desse produto. Para cadastro do usuário guardamos o seguinte: 
+    - Nome
+    - Email
+    - Senha
+    - CNPJ
+    - dadosBancarios
 
-2. Cadastro de produtos
-    - Código de barras único
-    - Subdivide em álbum que pode ter n faixas musicais e em single que tem uma única faixa musical. Cada faixa musical deve ter um ISCR único, seus musicos, produtos e compositores. 
+2. Tela cadastro de pessoas. Todo usuário do sistema pode cadastrar uma pessoa se ela não estiver ainda no banco. As pessoas assumem papel nas faixas musicais. Guardamos as seguintes informações dela:
+    - Nome
+    - Email
+    - CPF
+    - Rede social
+    - Telefone
+
+3. Cadastro de produtos
+    - Código de barras deve ser único por produto
+    - Um produto pode ser single, o qual deve ter apenas uma faixa. E também ser um álbum que pode ter n faixas musicais. Cada faixa musical deve ter um ISCR único, além de guardar a informação do autor, compositor e produtor musical. 
 
  
-3. Visualização dos ganhos recebidos por produto.
+4. Visualização dos ganhos recebidos por produto ou faixas
+
+5. Capacidade deletar
 
 <img src="/img/conceitual.png">
 <img src="/img/logico.png">
@@ -26,9 +36,6 @@ Sistema para cadastro de produtos musicais a serem distribuídos pela distribuid
 2. python 3.x.x - [Baixe python aqui](http://www.sis4.com/brModelo/)
 3. pip - pacote gerenciamento padrão
 4. SGBD - pgAdmin ou Dbeaver -  [Baixe pgAdmin aqui](https://www.pgadmin.org/)
-```
-
-```
 
 ### 🔧 Instalação
 
@@ -58,23 +65,34 @@ pip3 install psycopg2
 ```
 
 
-## ⚙️ Executando os testes
+## ⚙️ Executanando os testes e mostrando seus resultados
+1. Cadastro Usuário 
+<img src="/img/cadastroUsuario.png">
+<img src="/img/SenhaIncorreta.png">
+<img src="/img/tabelaUsuario.png">
 
-Explicar como executar os testes automatizados para este sistema.
+2. Cadastro de Pessoas
+<img src="/img/cadastroPessoa.png">
+<img src="/img/cpfexiste.png">
+<img src="/img/cadastroPessoa2.png">
+<img src="/img/consultaPessoaCpf.png">
+<img src="/img/consultaPessoaNome.png">
 
-### 🔩 Analise os testes de ponta a ponta
+3. Cadastro de Produtos 
 
-Explique que eles verificam esses testes e porquê.
+4. Visualizar produtos e faixas daquele usuário
 
-```
-Dar exemplos
-```
+5. Visualizar relatórios
 
+6. Deletar
 
 
 ## 📦 Implantação
 
-Adicione notas adicionais sobre como implantar isso em um sistema ativo
+```
+python main.py
+```
+
 
 ## 🛠️ Construído com
 

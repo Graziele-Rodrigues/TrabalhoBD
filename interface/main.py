@@ -162,7 +162,7 @@ class Faixas:
 
             # botao
             self.botaoCadastroPessoa = ctk.CTkButton(master=self.frameCadastroSingle,text='Cadastrar', width=250, font=placeholder_botao, command=self.enviaCadastroFaixaSingle)
-            self.botaoCadastroPessoa.grid(row=8, column=0, columnspan=3, padx=20, pady=20, sticky="ew")
+            self.botaoCadastroPessoa.grid(row=7, column=0, columnspan=3, padx=20, pady=20, sticky="ew")
 
 
         def enviaCadastroFaixaSingle(self):
