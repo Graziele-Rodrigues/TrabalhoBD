@@ -37,8 +37,8 @@ CREATE TABLE "FaixaMusical_Single" (
   "TempoDuracao" varchar(255),
   "fk_GeneroMusical_GeneroMusical_PK" int,
   "FaixaMusical" varchar(255),
-  "fk_Album_fk_Produto_CodigoBarras" varchar(255) UNIQUE,
-  "fk_Produto_CodigoBarras" varchar(255) UNIQUE,
+  "fk_Album_fk_Produto_CodigoBarras" varchar(255),
+  "fk_Produto_CodigoBarras" varchar(255),
   FOREIGN KEY ("fk_GeneroMusical_GeneroMusical_PK") REFERENCES "GeneroMusical" ("GeneroMusical_PK")
     ON DELETE SET NULL
     ON UPDATE CASCADE,
@@ -62,18 +62,14 @@ CREATE TABLE "Pessoa" (
 );
 
 CREATE TABLE "Participa" (
-  "idParticipa" int PRIMARY KEY,
+  "idParticipa" SERIAL PRIMARY KEY,
   "fk_Pessoa_CPF" char(11),
   "fk_FaixaMusical_Single_ISRC" varchar(255),
-  "fk_FaixaMusical_Single_fk_Produto_CodigoBarras" varchar(255),
   "TipoPessoa" varchar(255),
   FOREIGN KEY ("fk_Pessoa_CPF") REFERENCES "Pessoa" ("CPF")
     ON DELETE SET NULL
     ON UPDATE CASCADE,
   FOREIGN KEY ("fk_FaixaMusical_Single_ISRC") REFERENCES "FaixaMusical_Single" ("ISRC")
-    ON DELETE SET NULL
-    ON UPDATE CASCADE,
-  FOREIGN KEY ("fk_FaixaMusical_Single_fk_Produto_CodigoBarras") REFERENCES "FaixaMusical_Single" ("fk_Produto_CodigoBarras")
     ON DELETE SET NULL
     ON UPDATE CASCADE
 );

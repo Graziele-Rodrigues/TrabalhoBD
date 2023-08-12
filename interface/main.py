@@ -20,9 +20,24 @@ title_font = ctk.CTkFont(family="sans-serif", size=20, slant="italic", weight="b
 placeholder_botao = ctk.CTkFont(family="arial", size=15) 
 
 class Faixas:
-        def __init__(self, app, codigoBarras):
+        def __init__(self, app, codigoBarras, album=False):
             self.app = app
             self.codigoBarras = codigoBarras
+            self.fk_Album_fk_Produto_CodigoBarras = None  # Inicialmente, nenhum valor
+            self.pessoaAdicionada = None  # Inicialmente, nenhuma pessoa foi adicionada
+            self.generopk = None
+            self.album = album
+            self.escolheAlbumSingle()
+        
+        def get_pessoas(self):
+            # conectando banco de dados
+            banco = Banco()
+            bd = banco.conexao.cursor()
+            buscaPessoas = """ SELECT "CPF", "Nome" FROM "Pessoa"; """
+            bd.execute(buscaPessoas)
+            pessoas = bd.fetchall()
+            bd.close() 
+            return pessoas
         
         def get_listaGenero(self):
             # conectando banco de dados
@@ -31,8 +46,30 @@ class Faixas:
             buscaGeneros = """ SELECT "GeneroMusical" FROM "GeneroMusical"; """
             bd.execute(buscaGeneros)
             generos = bd.fetchall()
-            print(generos)
-            bd.close()  
+            bd.close() 
+            return generos 
+
+        def escolheAlbumSingle(self):
+            telaCadastrarProd = ctk.CTkToplevel(app)
+            telaCadastrarProd.title("Continuar cadastro")
+            telaCadastrarProd.geometry("800x800")
+            
+            self.label = ctk.CTkLabel(telaCadastrarProd,text="Agora selecione o tipo de produto que foi cadastrado:", font=title_font)
+            self.label.pack(pady=10)
+        
+            #frame
+            self.frameCadastroProd = ctk.CTkFrame(master=telaCadastrarProd)
+            self.frameCadastroProd.pack(pady=20, padx=40, fill='both', anchor=tk.CENTER, expand=True)
+
+            #botao CADASTRO SINGLE
+            self.botaoCadastroProd = ctk.CTkButton(master=self.frameCadastroProd,text='Cadastrar SINGLE/FAIXA MUSICAL', width=150, font=placeholder_botao, command=self.cadastroFaixaSingle)
+            self.botaoCadastroProd.grid(row=1, column=0, columnspan=3, padx=20, pady=20, sticky="ew") 
+
+            #botao CADASTRO ALBUM
+            self.botaoCadastroProd = ctk.CTkButton(master=self.frameCadastroProd,text='Cadastrar ALBUM', width=150, font=placeholder_botao, command=self.enviaAlbum)
+            self.botaoCadastroProd.grid(row=1, column=0, columnspan=3, padx=20, pady=20, sticky="ew")
+            self.botaoCadastroProd.grid(row=2, column=0, columnspan=3, padx=20, pady=20, sticky="ew") 
+
 
         def cadastroFaixaSingle(self):
             telaCadastrarSingle = ctk.CTkToplevel(app)
@@ -56,70 +93,161 @@ class Faixas:
 
             # NOME Label
             self.nomesingleLabel = ctk.CTkLabel(master=self.frameCadastroSingle, text="Nome", font=placeholder_botao)
-            self.nomesingleLabel.grid(row=2, column=0, padx=20, pady=20, sticky="ew")
+            self.nomesingleLabel.grid(row=1, column=0, padx=20, pady=20, sticky="ew")
                 
             # NOME Entry Field
             self.nomesingleEntry = ctk.CTkEntry(master=self.frameCadastroSingle, placeholder_text="insira o nome", font=placeholder_botao, width=400)
-            self.nomesingleEntry.grid(row=2, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+            self.nomesingleEntry.grid(row=1, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
 
             # TEMPO Label
             self.tempooLabel = ctk.CTkLabel(master=self.frameCadastroSingle, text="Tempo", font=placeholder_botao)
-            self.tempooLabel.grid(row=3, column=0, padx=20, pady=20, sticky="ew")
+            self.tempooLabel.grid(row=2, column=0, padx=20, pady=20, sticky="ew")
                 
             # TEMPO DURACAO Entry Field
             self.tempooEntry = ctk.CTkEntry(master=self.frameCadastroSingle, placeholder_text="insira o tempo da faixa", font=placeholder_botao, width=400)
-            self.tempooEntry.grid(row=3, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+            self.tempooEntry.grid(row=2, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
 
             # FK_GENERO MUSICAL Label
             self.generoLabel = ctk.CTkLabel(master=self.frameCadastroSingle, text="Gênero", font=placeholder_botao)
-            self.generoLabel.grid(row=4, column=0, padx=20, pady=20, sticky="ew")
+            self.generoLabel.grid(row=3, column=0, padx=20, pady=20, sticky="ew")
                
             # FK_GENERO MUSICAL Entry Field
-            combo = ttk.Combobox(telaCadastrarSingle)
-            generos = self.get_listaGenero() 
-            combo['values'] = generos
-            combo.grid(row=4, column=1, padx=20, pady=20, sticky="ew")
-            combo.current(0)
+            generos = self.get_listaGenero()
+            generos_list = [genero[0] for genero in generos]  # Extrair os valores reais dos gêneros
+            self.combo = ctk.CTkComboBox(master=self.frameCadastroSingle, values=generos_list)
+            self.combo.grid(row=3, column=1, padx=20, pady=20, sticky="ew")
+            self.combo.set(generos_list[0])  # Defina o valor padrão
             
             # FAIXA MUSICAL Label
             self.faixaLabel = ctk.CTkLabel(master=self.frameCadastroSingle, text="Faixa musical", font=placeholder_botao)
-            self.faixaLabel.grid(row=5, column=0, padx=20, pady=20, sticky="ew")
+            self.faixaLabel.grid(row=4, column=0, padx=20, pady=20, sticky="ew")
                 
             # FAIXA MUSICAL Entry Field
             self.faixaEntry = ctk.CTkEntry(master=self.frameCadastroSingle, placeholder_text="insira detalhes sobre a faixa", font=placeholder_botao, width=400)
-            self.faixaEntry.grid(row=5, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+            self.faixaEntry.grid(row=4, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+            
+            pessoas = self.get_pessoas()
+            pessoas_list = [pessoa[0] for pessoa in pessoas]  # Extrair pessoas
 
-            # FK_ALBUM PROUDUTO COD BARRAS Label
-            self.codbarrasAlbLabel = ctk.CTkLabel(master=self.frameCadastroSingle, text="Código de barras Álbum", font=placeholder_botao)
-            self.codbarrasAlbLabel.grid(row=6, column=0, padx=20, pady=20, sticky="ew")
-                
-            # FK_ALBUM PROUDUTO COD BARRAS Entry Field
-            self.codbarrasAlbEntry = ctk.CTkEntry(master=self.frameCadastroSingle, placeholder_text="insira o codigo barras do Álbum que a faixa faz parte", font=placeholder_botao, width=400)
-            self.codbarrasAlbEntry.grid(row=6, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+            pessoas = self.get_pessoas()
+            pessoas_list = [f"{pessoa[0]} - {pessoa[1]}" for pessoa in pessoas]  # Extrair CPF e Nome
+
+            # Autor MUSICAL Label
+            self.autorLabel = ctk.CTkLabel(master=self.frameCadastroSingle, text="Autor", font=placeholder_botao)
+            self.autorLabel.grid(row=5, column=0, padx=20, pady=20, sticky="ew")
+
+            # Autor Entry Field
+            self.autor = ctk.CTkComboBox(master=self.frameCadastroSingle, values=pessoas_list)
+            self.autor.grid(row=5, column=1, padx=20, pady=20, sticky="ew")
+            self.autor.set(pessoas_list[0])  # Defina o valor padrão
+
+            # Compositor MUSICAL Label
+            self.compositorLabel = ctk.CTkLabel(master=self.frameCadastroSingle, text="Compositor", font=placeholder_botao)
+            self.compositorLabel.grid(row=6, column=0, padx=20, pady=20, sticky="ew")
+
+            # Compositor Entry Field
+            self.compositor = ctk.CTkComboBox(master=self.frameCadastroSingle, values=pessoas_list)
+            self.compositor.grid(row=6, column=1, padx=20, pady=20, sticky="ew")
+            self.compositor.set(pessoas_list[0])  # Defina o valor padrão
+
+            # Produtor Label
+            self.produtorLabel = ctk.CTkLabel(master=self.frameCadastroSingle, text="Produtor Musical", font=placeholder_botao)
+            self.produtorLabel.grid(row=7, column=0, padx=20, pady=20, sticky="ew")
+
+            # Produtor Label
+            self.produtor = ctk.CTkComboBox(master=self.frameCadastroSingle, values=pessoas_list)
+            self.produtor.grid(row=7, column=1, padx=20, pady=20, sticky="ew")
+            self.produtor.set(pessoas_list[0])  # Defina o valor padrão
 
             # botao
-            self.botaoCadastroPessoa = ctk.CTkButton(master=self.frameCriaNovaPessoa,text='Cadastrar', width=250, font=placeholder_botao, command=self.enviaCadastroSingle)
-            self.botaoCadastroPessoa.grid(row=7, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
+            self.botaoCadastroPessoa = ctk.CTkButton(master=self.frameCadastroSingle,text='Cadastrar', width=250, font=placeholder_botao, command=self.enviaCadastroFaixaSingle)
+            self.botaoCadastroPessoa.grid(row=8, column=0, columnspan=3, padx=20, pady=20, sticky="ew")
 
 
-        def enviaCadastroSingle(self):
-            banco = Banco()  # Certifique-se de que a classe Banco esteja corretamente definida
+        def enviaCadastroFaixaSingle(self):
+            banco = Banco()
             bd = banco.conexao.cursor()
             try:
-                slq = """INSERT INTO public."FaixaMusical_Single"("ISRC", "Nome", "TempoDuracao", "fk_GeneroMusical_GeneroMusical_PK", "FaixaMusical", "fk_Album_fk_Produto_CodigoBarras","fk_Produto_CodigoBarras")VALUES(%s,%s,%s,%s,%s,%s,%s)"""  
-                bd.execute(sql, (self.ISRCcEntry.get(), self.nomesingleEntry.get(), self.tempooEntry.get(), self.fk.get(), self.faixaEntry.get(), self.fk.get(), self.fk.cnpj,))
+                bd.execute(
+                    "SELECT \"fk_Produto_CodigoBarras\" FROM public.\"Album\" WHERE \"fk_Produto_CodigoBarras\" = %s",
+                    (self.codigoBarras,),
+                )
+                result = bd.fetchone()
+                if result:
+                    self.fk_Album_fk_Produto_CodigoBarras = result[0]
+
+                bd.execute(
+                    "SELECT \"GeneroMusical_PK\" FROM public.\"GeneroMusical\" WHERE \"GeneroMusical\" = %s",
+                    (self.combo.get(),),
+                )
+                result = bd.fetchone()
+                if result:
+                    self.generopk = result[0]
                 
-                banco.conexao.commit()  # Commit as alterações no banco de dados
-                bd.close()  # Feche a comunicação com o banco de dados
-            
+                if not self.album:  # Verifique se não é um álbum (ou seja, é um single)
+                    bd.execute("SELECT COUNT(*) FROM public.\"FaixaMusical_Single\" WHERE \"fk_Produto_CodigoBarras\" = %s", (self.codigoBarras,))
+                    count = bd.fetchone()[0]
+
+                    if count != 0:
+                        tkmb.showerror(title="Erro", message="É um single, logo é permitido cadastrar apenas uma faixa")
+                        return
+
+                # Insere tabela FaixaMusical_Single
+                sql = """INSERT INTO public."FaixaMusical_Single"("ISRC", "Nome", "TempoDuracao", "fk_GeneroMusical_GeneroMusical_PK", "FaixaMusical", "fk_Album_fk_Produto_CodigoBarras", "fk_Produto_CodigoBarras") VALUES(%s,%s,%s,%s,%s,%s,%s)"""
+                bd.execute(
+                    sql,(self.ISRCcEntry.get(), self.nomesingleEntry.get(), self.tempooEntry.get(), self.generopk, self.faixaEntry.get(), self.fk_Album_fk_Produto_CodigoBarras, self.codigoBarras,),
+                )
+                banco.conexao.commit()
+
+                # Insere tabela Participa_em
+                self.autor_cpf = self.autor.get().split(' - ')[0]
+                self.compositor_cpf = self.compositor.get().split(' - ')[0]
+                self.produtor_cpf = self.produtor.get().split(' - ')[0]
+
+                sql = """INSERT INTO public."Participa"("fk_Pessoa_CPF", "fk_FaixaMusical_Single_ISRC", "TipoPessoa") VALUES(%s,%s,%s)"""
+                bd.execute(sql, (self.autor_cpf, self.ISRCcEntry.get(), "autor"),)
+                banco.conexao.commit()
+                bd.execute(sql, (self.compositor_cpf, self.ISRCcEntry.get(), "compositor"),)
+                banco.conexao.commit()
+                bd.execute(sql, (self.produtor_cpf, self.ISRCcEntry.get(), "produtor"),)
+                banco.conexao.commit()
+
+                bd.close()
+                tkmb.showinfo(title="Cadastrado com Sucesso", message="Cadastro da faixa musical realizado com sucesso!",)
+
             except (Exception, psycopg2.DatabaseError) as error:
                 print(error)
-                # Exiba uma mensagem de erro se houver algum problema com a inserção
-                # tkmb.showerror(title="Erro", message="Ocorreu um erro ao cadastrar o produto.")
+                tkmb.showerror(
+                    title="Erro",
+                    message="Ocorreu um erro ao cadastrar a faixa musical.",
+                )
 
             finally:
                 if banco is not None:
-                    tkmb.showinfo(title="Cadastrado Sucesso", message="Cadastro realizado com sucesso!")
+                    pass
+        
+
+        def enviaAlbum(self):
+            banco = Banco()  # Certifique-se de que a classe Banco esteja corretamente definida
+            bd = banco.conexao.cursor()
+            try:
+                sql = """INSERT INTO public."Album"("fk_Produto_CodigoBarras") VALUES(%s)"""  
+                bd.execute(sql, (self.codigoBarras, ))
+                
+                banco.conexao.commit()  # Commit as alterações no banco de dados
+                bd.close()  # Feche a comunicação com o banco de dados
+                tkmb.showinfo(title="Cadastrado Sucesso", message="Cadastro realizado com sucesso!")
+
+            except (Exception, psycopg2.DatabaseError) as error:
+                print(error)
+                # Exiba uma mensagem de erro se houver algum problema com a inserção
+                tkmb.showerror(title="Erro", message="Ocorreu um erro ao cadastrar o produto.")
+
+            finally:
+                if banco is not None:
+                    self.album = True
+                    self.cadastroFaixaSingle()
+            
                    
 
 class Produto:
@@ -322,11 +450,11 @@ class Produto:
                 finally:
                     if banco is not None:
                         banco.conexao.close()
-                            
+
         def cadastroProdutos(self):
                 telaCadastrarProduto = ctk.CTkToplevel(app)
                 telaCadastrarProduto.title("Cadastrar produto")
-                telaCadastrarProduto.geometry("800x800")
+                telaCadastrarProduto.geometry("900x800")
             
                 self.label = ctk.CTkLabel(telaCadastrarProduto,text="Cadastre o produto:", font=title_font)
                 self.label.pack(pady=10)
@@ -383,254 +511,46 @@ class Produto:
                 self.idiomaEntry = ctk.CTkEntry(master=self.frameCadastroProd, placeholder_text="insira o idioma do álbum/single", font=placeholder_botao, width=400)
                 self.idiomaEntry.grid(row=5, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
 
-                # # cnpj usuario Label
-                # self.cnpjusuarioLabel = ctk.CTkLabel(master=self.frameCadastroProd, text="CNPJ do usuario", font=placeholder_botao)
-                # self.cnpjusuarioLabel.grid(row=6, column=0, padx=20, pady=20, sticky="ew")
-                    
-                # # cnpj usuaario Entry Field
-                # self.cnpjusuarioEntry = ctk.CTkEntry(master=self.frameCadastroProd, placeholder_text="Insira o cnpj de usuario", font=placeholder_botao, width=400)
-                # self.cnpjusuarioEntry.grid(row=6, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
-
                 # botao de envio PRODUTO
                 self.botaoCadastroProduto = ctk.CTkButton(master=self.frameCadastroProd,text='Cadastrar PRODUTO', width=150, font=placeholder_botao, command=self.enviaDadosProduto)
                 self.botaoCadastroProduto.grid(row=6, column=0, columnspan=3, padx=20, pady=20, sticky="ew") 
-
-                self.exibeProdutos()
+                
         
         def enviaDadosProduto(self):
             banco = Banco()  # Certifique-se de que a classe Banco esteja corretamente definida
             bd = banco.conexao.cursor()
             try:
-                # # Verifique se o CNPJ do usuário (fk_Usuario_CNPJ) existe na tabela "Usuario" antes de inserir na tabela "Produto"
-                # bd.execute("SELECT COUNT(*) FROM public.\"Usuario\" WHERE \"CNPJ\" = %s", (self.cnpjusuarioEntry.get(),))
-                # count = bd.fetchone()[0]
-
-                # if count == 0:
-                #     tkmb.showerror(title="Erro", message="O CNPJ do usuário não existe na tabela 'Usuario'.")
-                #     return
-
-                # Converter a data para um objeto date
                 try:
                     dataEntry = date.fromisoformat(self.dataEntry.get())
                 except ValueError as error:
                      print(error)
                      tkmb.showerror(title="Erro", message="Data com formato errado.")
                      return
-
-                sql = """INSERT INTO public."Produto"("CodigoBarras", "Nome", "Capa", "Descricao", "Idioma", "DataLancamento", "fk_Usuario_CNPJ") VALUES(%s,%s,%s,%s,%s,%s,%s)"""  
-                bd.execute(sql, (self.codbarrasEntry.get(), self.nameProdEntry.get(), self.capaEntry.get(), self.descricaoEntry.get(), self.idiomaEntry.get(), self.dataEntry.get(), self.cnpj,))
                 
-                banco.conexao.commit()  # Commit as alterações no banco de dados
-                bd.close()  # Feche a comunicação com o banco de dados
-            
-            except (Exception, psycopg2.DatabaseError) as error:
-                print(error)
-                # Exiba uma mensagem de erro se houver algum problema com a inserção
-                # tkmb.showerror(title="Erro", message="Ocorreu um erro ao cadastrar o produto.")
-
-            finally:
-                if banco is not None:
-                    tkmb.showinfo(title="Cadastrado Sucesso", message="Cadastro realizado com sucesso!")
-                    #conectando banco de dados
-            
-            telaCadastrarProd = ctk.CTkToplevel(app)
-            telaCadastrarProd.title("Continuar cadastro")
-            telaCadastrarProd.geometry("800x800")
-            
-            self.label = ctk.CTkLabel(telaCadastrarProd,text="Agora selecione o tipo de produto que foi cadastrado:", font=title_font)
-            self.label.pack(pady=10)
-        
-            #frame
-            self.frameCadastroProd = ctk.CTkFrame(master=telaCadastrarProd)
-            self.frameCadastroProd.pack(pady=20, padx=40, fill='both', anchor=tk.CENTER, expand=True)
-
-            #botao CADASTRO SINGLE
-            self.botaoCadastroProd = ctk.CTkButton(master=self.frameCadastroProd,text='Cadastrar SINGLE/FAIXA MUSICAL', width=150, font=placeholder_botao, command=Faixas.cadastroFaixaSingle)
-            self.botaoCadastroProd.grid(row=1, column=0, columnspan=3, padx=20, pady=20, sticky="ew") 
-
-            #botao CADASTRO ALBUM
-            self.botaoCadastroProd = ctk.CTkButton(master=self.frameCadastroProd,text='Cadastrar ALBUM', width=150, font=placeholder_botao, command=self.cadastroAlbum)
-            self.botaoCadastroProd.grid(row=1, column=0, columnspan=3, padx=20, pady=20, sticky="ew") 
-
-        def cadastroEnviaAlbum(self):
-            banco = Banco()  # Certifique-se de que a classe Banco esteja corretamente definida
-            bd = banco.conexao.cursor()
-            try:
-                slq = """INSERT INTO public."Album"("fk_Produto_CodigoBarras") VALUES(%s)"""  
-                bd.execute(sql, (self.codbarrasEntry,))
-                
-                banco.conexao.commit()  # Commit as alterações no banco de dados
-                bd.close()  # Feche a comunicação com o banco de dados
-            
-            except (Exception, psycopg2.DatabaseError) as error:
-                print(error)
-                # Exiba uma mensagem de erro se houver algum problema com a inserção
-                # tkmb.showerror(title="Erro", message="Ocorreu um erro ao cadastrar o produto.")
-
-            finally:
-                if banco is not None:
-                    tkmb.showinfo(title="Cadastrado Sucesso", message="Cadastro realizado com sucesso!")
-                
-
-        def exibeProdutos(self):
-            # Cria a tabela
-            self.columns = ("CodigoBarras", "Nome", "Lançamento", "Ações")
-            self.table = ttk.Treeview(master=self.frameCadastro, columns=self.columns, show="headings", height=10)
-            for col in self.columns:
-                self.table.heading(col, text=col)
-                self.table.column(col, anchor="center")  # Centraliza o conteúdo das células
-            self.table.grid(row=7, column=0, columnspan=2, padx=30, pady=10, sticky="ew")
-
-            # Aumenta a largura das colunas da tabela
-            self.table.column("CodigoBarras", width=150)  # Ajuste a largura conforme necessário
-            self.table.column("Nome", width=200)  # Ajuste a largura conforme necessário
-            self.table.column("Lançamento", width=150)  # Ajuste a largura conforme necessário
-            self.table.column("Ações", width=100)  # Ajuste a largura conforme necessário
-
-            # Estiliza o cabeçalho da tabela (nomes das colunas)
-            style = ttk.Style()
-            style.configure("Treeview.Heading", font=("Arial", 10, "bold"), foreground="blue")  # Define fonte em negrito e cor azul
-
-            # Cria uma instância do banco
-            banco = Banco()
-            bd = banco.conexao.cursor()
-
-            try:
-                # Remova os espaços em branco do CNPJ
-                cnpj = self.cnpj[0].strip()
-                # Execute a consulta SQL para obter os dados dos produtos cadastrados
-                bd.execute("SELECT \"CodigoBarras\", \"Nome\", \"DataLancamento\" FROM public.\"Produto\" WHERE \"fk_Usuario_Cnpj\" = %s", (cnpj,))
-                dados_produtos = bd.fetchall()
-                
-                # Limpe a tabela antes de preencher novamente
-                for item in self.table.get_children():
-                    self.table.delete(item)
-
-                # Preencha a tabela com os dados obtidos da consulta 
-                for produto in dados_produtos:
-                    codigo_barras, nome, lancamento = produto
-                    self.table.insert("", "end", values=(codigo_barras, nome, lancamento, ""))
-                    button = ctk.CTkButton(self.table, text="Ação", command=Faixas(app, codigo_barras))
-                    self.table.window_create("", window=button, padx=10, pady=5)
-
-            except (Exception, psycopg2.DatabaseError) as error:
-                print(error)
-                # Exiba uma mensagem de erro se houver algum problema com a consulta
-
-            finally:
-                if banco is not None:
-                    banco.conexao.close()
-
-        def editaProdutos(self):
-            telaEditarProduto = ctk.CTkToplevel(app)
-            telaEditarProduto.title("Editar produto")
-            telaEditarProduto.geometry("800x800")
-            
-            self.label = ctk.CTkLabel(telaEditarProduto,text="Preencha os campos abaixo:", font=title_font)
-            self.label.pack(pady=10)
-           
-            #frame
-            self.frameEditarProduto = ctk.CTkFrame(master=telaEditarProduto)
-            self.frameEditarProduto.pack(pady=20, padx=40, fill='both', anchor=tk.CENTER, expand=True)
-    
-            # Código de barras Label
-            self.codbarrasLabel = ctk.CTkLabel(master=self.frameEditarProduto, text="Código de barras", font=placeholder_botao)
-            self.codbarrasLabel.grid(row=0, column=0, padx=20, pady=20, sticky="ew")
-            
-            # Código de barra Entry Field
-            self.codbarrasEntry = ctk.CTkEntry(master=self.frameEditarProduto, placeholder_text="insira o codigo barras", font=placeholder_botao, width=400)
-            self.codbarrasEntry.grid(row=0, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
-            
-            # Nome Label
-            self.nameProdLabel = ctk.CTkLabel(master=self.frameEditarProduto, text="Nome", font=placeholder_botao)
-            self.nameProdLabel.grid(row=1, column=0, padx=20, pady=20, sticky="ew")
-            
-            # Nome Entry Field
-            self.nameProdEntry = ctk.CTkEntry(master=self.frameEditarProduto, placeholder_text="nome do álbum/single", font=placeholder_botao, width=400)
-            self.nameProdEntry.grid(row=1, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
-    
-            # Descrição capa Label
-            self.capaLabel = ctk.CTkLabel(master=self.frameEditarProduto, text="Descrição visual de elementos da capa", font=placeholder_botao)
-            self.capaLabel.grid(row=2, column=0, padx=20, pady=20, sticky="ew")
-                
-            # Descrição capa Entry Field
-            self.capaEntry = ctk.CTkEntry(master=self.frameEditarProduto, placeholder_text="insira a descrição visual da capa", font=placeholder_botao, width=400)
-            self.capaEntry.grid(row=2, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
-
-            # Descrição Label
-            self.descricaoLabel = ctk.CTkLabel(master=self.frameEditarProduto, text="Descrição", font=placeholder_botao)
-            self.descricaoLabel.grid(row=3, column=0, padx=20, pady=20, sticky="ew")
-                
-            # Descrição Entry Field
-            self.descricaoEntry = ctk.CTkEntry(master=self.frameEditarProduto, placeholder_text="insira a descrição do álbum/single", font=placeholder_botao, width=400)
-            self.descricaoEntry.grid(row=3, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
-            
-            # Data de lançamento Label
-            self.dataLabel = ctk.CTkLabel(master=self.frameEditarProduto, text="Data de lançamento", font=placeholder_botao)
-            self.dataLabel.grid(row=4, column=0, padx=20, pady=20, sticky="ew")
-            
-            # Data de lançamento Entry Field
-            self.dataEntry = ctk.CTkEntry(master=self.frameEditarProduto, placeholder_text="insira a data (AAAA-MM-DD)", font=placeholder_botao, width=400)
-            self.dataEntry.grid(row=4, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
-    
-            # Idioma Label
-            self.idiomaLabel = ctk.CTkLabel(master=self.frameEditarProduto, text="Idioma", font=placeholder_botao)
-            self.idiomaLabel.grid(row=5, column=0, padx=20, pady=20, sticky="ew")
-                
-            # Idioma Entry Field
-            self.idiomaEntry = ctk.CTkEntry(master=self.frameEditarProduto, placeholder_text="insira o idioma do álbum/single", font=placeholder_botao, width=400)
-            self.idiomaEntry.grid(row=5, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
-
-            # cnpj usuario Label
-            self.cnpjusuarioLabel = ctk.CTkLabel(master=self.frameEditarProduto, text="CNPJ do usuario", font=placeholder_botao)
-            self.cnpjusuarioLabel.grid(row=6, column=0, padx=20, pady=20, sticky="ew")
-                
-            # cnpj usuaario Entry Field
-            self.cnpjusuarioEntry = ctk.CTkEntry(master=self.frameEditarProduto, placeholder_text="Insira o cnpj de usuario", font=placeholder_botao, width=400)
-            self.cnpjusuarioEntry.grid(row=6, column=1, columnspan=3, padx=20, pady=20, sticky="ew")
-
-            # botao de envio PRODUTO
-            self.botaoCadastroProduto = ctk.CTkButton(master=self.frameEditarProduto,text='Editar PRODUTO', width=150, font=placeholder_botao, command=self.editaDadosProduto)
-            self.botaoCadastroProduto.grid(row=7, column=0, columnspan=3, padx=20, pady=20, sticky="ew") 
-
-            self.exibeProdutos()
-
-        def editaDadosProduto(self):
-            banco = Banco()  # Certifique-se de que a classe Banco esteja corretamente definida
-            bd = banco.conexao.cursor()
-            try:
-                # Verifique se o CNPJ do usuário (fk_Usuario_CNPJ) existe na tabela "Usuario" antes de inserir na tabela "Produto"
-                bd.execute("SELECT COUNT(*) FROM public.\"Usuario\" WHERE \"CNPJ\" = %s", (self.cnpjusuarioEntry.get(),))
+                # Verifique se o CNPJ do usuário (fk_Usuario_CNPJ) existe na tabela "Usuario" antes de inserir na tabela "Pessoa"
+                bd.execute("SELECT COUNT(*) FROM public.\"Usuario\" WHERE \"CNPJ\" = %s", (self.cnpj,))
                 count = bd.fetchone()[0]
 
                 if count == 0:
                     tkmb.showerror(title="Erro", message="O CNPJ do usuário não existe na tabela 'Usuario'.")
                     return
 
-                # Converter a data para um objeto date
-                try:
-                    dataEntry = date.fromisoformat(self.dataEntry.get())
-                except ValueError as error:
-                    print(error)
-                    tkmb.showerror(title="Erro", message="Data com formato errado.")
-                    return
-
-                sql = """UPDATE public."Produto" SET CodigoBarras = %s, SET Nome = %s, SET Capa = %s, SET Descricao = %s, SET Idioma = %s, SET DataLancamento = %s WHERE fk_Usuario_CNPJ = %s"""  
-                bd.execute(sql, (self.codbarrasEntry.get(), self.nameProdEntry.get(), self.capaEntry.get(), self.descricaoEntry.get(), self.idiomaEntry.get(), dataEntry, self.cnpjusuarioEntry.get()))
+                sql = """INSERT INTO public."Produto"("CodigoBarras", "Nome", "Capa", "Descricao", "Idioma", "DataLancamento", "fk_Usuario_Cnpj") VALUES(%s,%s,%s,%s,%s,%s,%s)"""  
+                bd.execute(sql, (self.codbarrasEntry.get(), self.nameProdEntry.get(), self.capaEntry.get(), self.descricaoEntry.get(), self.idiomaEntry.get(), self.dataEntry.get(), self.cnpj,))
                 
                 banco.conexao.commit()  # Commit as alterações no banco de dados
                 bd.close()  # Feche a comunicação com o banco de dados
-
                 tkmb.showinfo(title="Cadastrado Sucesso", message="Cadastro realizado com sucesso!")
-            
+
             except (Exception, psycopg2.DatabaseError) as error:
                 print(error)
-                # Exiba uma mensagem de erro se houver algum problema com a inserção
                 tkmb.showerror(title="Erro", message="Ocorreu um erro ao cadastrar o produto.")
 
             finally:
                 if banco is not None:
-                    banco.conexao.close() 
+                    Faixas(app, self.codbarrasEntry.get())
+                    #conectando banco de dados
+            
 
         def deletaProduto(self):
             telaDeletarProduto = ctk.CTkToplevel(app)
@@ -926,17 +846,163 @@ class Produto:
             self.label.pack(pady=10)
 
 
+        def exibeProdutos(self):
+            # Cria a tabela
+            self.columns = ("Codigo Barras", "Nome", "Lançamento", "Idioma")
+            self.table = ttk.Treeview(master=self.frameIndex3, columns=self.columns, show="headings", height=10)
+            for col in self.columns:
+                self.table.heading(col, text=col)
+                self.table.column(col, anchor="center")  # Centraliza o conteúdo das células
+            self.table.grid(row=0, column=0, columnspan=2, padx=30, pady=10, sticky="ew")
+
+            # Aumenta a largura das colunas da tabela
+            self.table.column("Codigo Barras", width=200)  # Ajuste a largura conforme necessário
+            self.table.column("Nome", width=200)  # Ajuste a largura conforme necessário
+            self.table.column("Lançamento", width=200)  # Ajuste a largura conforme necessário
+            self.table.column("Idioma", width=200)  # Ajuste a largura conforme necessário
+
+            # Estiliza o cabeçalho da tabela (nomes das colunas)
+            style = ttk.Style()
+            style.configure("Treeview.Heading", font=("Arial", 10, "bold"), foreground="blue")  # Define fonte em negrito e cor azul
+
+            # Cria uma instância do banco
+            banco = Banco()
+            bd = banco.conexao.cursor()
+
+            try:
+                # Execute a consulta SQL para obter os dados produtos cadastrados daquele usuario
+                bd.execute("SELECT \"CodigoBarras\", \"Nome\", \"DataLancamento\", \"Idioma\" FROM public.\"Produto\" WHERE \"fk_Usuario_Cnpj\" = %s", (self.cnpj,))
+                dados_produtos = bd.fetchall()
+
+                # Limpe a tabela antes de preencher novamente
+                for item in self.table.get_children():
+                    self.table.delete(item)
+
+                # Preencha a tabela com os dados obtidos da consulta
+                for produto in dados_produtos:
+                    codigo_barras, nome, lancamento, idioma = produto
+                    self.table.insert("", "end", values=(codigo_barras, nome, lancamento, idioma))
+
+                 # Bind the item selection event to a function
+                    self.table.bind("<ButtonRelease-1>", self.on_item_select)
+
+            except (Exception, psycopg2.DatabaseError) as error:
+                print(error)
+                # Exiba uma mensagem de erro se houver algum problema com a consulta
+
+            finally:
+                if banco is not None:
+                    banco.conexao.close()
+
+        
+        def on_item_select(self, event):
+            selected_item = self.table.focus()
+            if selected_item:
+                item = self.table.item(selected_item)
+                codigo_barras = item['values'][0]  # Assuming the barcode is the first column in the table
+                self.exibeFaixas(codigo_barras)
+
+
+        def exibeFaixas(self, codigoBarras):
+            self.codigo = str(codigoBarras)
+            telaExibeFaixas = ctk.CTkToplevel(app)
+            telaExibeFaixas.title("Faixas do produto: ")
+            telaExibeFaixas.geometry("800x800")
+
+            self.label = ctk.CTkLabel(telaExibeFaixas,text="Consultar número de reproduções de um artista", font=title_font)
+            self.label.pack(pady=10)
+
+            #frame
+            self.frameExibeFaixas = ctk.CTkFrame(master=telaExibeFaixas)
+            self.frameExibeFaixas.pack(pady=20, padx=40, fill='both', expand=True)
+
+            # Cria a tabela
+            self.columns = ("ISCR", "Nome", "Autor", "Compositor", "Produtor")
+            self.table = ttk.Treeview(master=self.frameExibeFaixas, columns=self.columns, show="headings", height=10)
+            for col in self.columns:
+                self.table.heading(col, text=col)
+                self.table.column(col, anchor="center")  # Centraliza o conteúdo das células
+            self.table.grid(row=0, column=0, columnspan=2, padx=30, pady=10, sticky="ew")
+
+            # Aumenta a largura das colunas da tabela
+            self.table.column("ISCR", width=150)  # Ajuste a largura conforme necessário
+            self.table.column("Nome", width=150)  # Ajuste a largura conforme necessário
+            self.table.column("Autor", width=150)  # Ajuste a largura conforme necessário
+            self.table.column("Compositor", width=150)  # Ajuste a largura conforme necessário
+            self.table.column("Produtor", width=150)  # Ajuste a largura conforme necessário
+
+            # Estiliza o cabeçalho da tabela (nomes das colunas)
+            style = ttk.Style()
+            style.configure("Treeview.Heading", font=("Arial", 10, "bold"), foreground="blue")  # Define fonte em negrito e cor azul
+
+            banco = Banco()
+            bd = banco.conexao.cursor()
+            try:
+                bd.execute("SELECT \"ISRC\", \"Nome\" FROM public.\"FaixaMusical_Single\" WHERE \"fk_Produto_CodigoBarras\" = %s", (self.codigo,))
+                dados_faixas = bd.fetchall()
+
+                sql = """SELECT "Nome" FROM public."Participa" pa
+                        JOIN public."Pessoa" ON "CPF" = pa."fk_Pessoa_CPF" 
+                        WHERE pa."TipoPessoa" = 'autor' AND pa."fk_FaixaMusical_Single_ISRC" IN (
+                            SELECT "ISRC"
+                            FROM public."FaixaMusical_Single"
+                            WHERE "fk_Produto_CodigoBarras" = %s
+                        );"""
+
+                bd.execute(sql, (self.codigo, ))
+                self. autor = bd.fetchall()
+
+                sql = """SELECT "Nome" FROM public."Participa" pa
+                        JOIN public."Pessoa" ON "CPF" = pa."fk_Pessoa_CPF" 
+                        WHERE pa."TipoPessoa" = 'compositor' AND pa."fk_FaixaMusical_Single_ISRC" IN (
+                            SELECT "ISRC"
+                            FROM public."FaixaMusical_Single"
+                            WHERE "fk_Produto_CodigoBarras" = %s
+                        );"""
+
+                bd.execute(sql, (self.codigo, ))
+                self.compositor = bd.fetchall()
+
+                sql = """SELECT "Nome" FROM public."Participa" pa
+                        JOIN public."Pessoa" ON "CPF" = pa."fk_Pessoa_CPF" 
+                        WHERE pa."TipoPessoa" = 'autor' AND pa."fk_FaixaMusical_Single_ISRC" IN (
+                            SELECT "ISRC"
+                            FROM public."FaixaMusical_Single"
+                            WHERE "fk_Produto_CodigoBarras" = %s
+                        );"""
+
+                bd.execute(sql, (self.codigo, ))
+                self.produtor = bd.fetchall()
+
+                # Limpe a tabela antes de preencher novamente
+                for item in self.table.get_children():
+                    self.table.delete(item)
+
+                # Preencha a tabela com os dados obtidos da consulta
+                count = 0
+                for faixas in dados_faixas:
+                    isrc, nome = faixas
+                    self.table.insert("", "end", values=(isrc, nome, self.autor[count], self.compositor[count], self.compositor[count]))
+                    count=count+1
+                    
+            except (Exception, psycopg2.DatabaseError) as error:
+                print(error)
+                # Exiba uma mensagem de erro se houver algum problema com a consulta
+
+            finally:
+                if banco is not None:
+                    banco.conexao.close()
+
         def index(self):
             index = ctk.CTkToplevel(app)
             index.geometry("800x800")
             index.title("Tela inicial")
 
             # Criar a imagem
-            # self.my_image = Image.open("image/logo.png")
-            # self.my_image = ImageTk.PhotoImage(self.my_image.resize((150, 150)))  # Resize the image
-            # self.image_label = ctk.CTkLabel(index, image=self.my_image, text="")
-            # self.image_label.grid(row=0, column=0, padx=20, pady=20, sticky="w")
-
+            self.my_image = Image.open("interface/image/logo.png")
+            self.my_image = ImageTk.PhotoImage(self.my_image.resize((150, 150)))  # Resize the image
+            self.image_label = ctk.CTkLabel(index, image=self.my_image, text="")
+            self.image_label.grid(row=0, column=0, padx=20, pady=20, sticky="w")
 
             # Criar o rótulo
             self.label = ctk.CTkLabel(index, text="Distribuidora digital de música", font=title_font)
@@ -957,14 +1023,20 @@ class Produto:
             # Criar o botão para cadastrar produto
             self.btn_cadastraProduto = ctk.CTkButton(master=self.frameIndex2, text="Cadastrar produto", width=175, font=placeholder_botao, command=self.cadastroProdutos)
             self.btn_cadastraProduto.grid(row=1, column=0, padx=30, pady=10, sticky="ew")
-
-            # Criar o botão para editar produto
-            self.btn_editaProduto = ctk.CTkButton(master=self.frameIndex2, text="Editar produto", width=175, font=placeholder_botao, command=self.editaProdutos)
-            self.btn_editaProduto.grid(row=1, column=1, padx=30, pady=10, sticky="ew")
-
+   
             # Criar o botão para deletar produtos
             self.btn_deletaProduto = ctk.CTkButton(master=self.frameIndex2, text="Deletar produto", width=175, font=placeholder_botao, command=self.deletaProduto)
-            self.btn_deletaProduto.grid(row=1, column=2, padx=30, pady=10, sticky="ew")
+            self.btn_deletaProduto.grid(row=1, column=1, padx=30, pady=10, sticky="ew")
+
+            # botao de atualizar meus produtos
+            self.botaoCadastroProduto = ctk.CTkButton(master=self.frameIndex2,text='Atualizar produtos', width=150, font=placeholder_botao, command=self.exibeProdutos)
+            self.botaoCadastroProduto.grid(row=1, column=2, columnspan=3, padx=20, pady=20, sticky="ew") 
+
+            # Cria Frame
+            self.frameIndex3 = ctk.CTkFrame(master=index)
+            self.frameIndex3.grid(row=3, column=0, columnspan=2, padx=40, pady=20, sticky="ew")
+
+            self.exibeProdutos()
 
             
 class Usuario:
@@ -1010,10 +1082,10 @@ class Usuario:
             self.frame = ctk.CTkFrame(master=app)
             self.frame.pack(pady=20, padx=40, fill='both', expand=True)
 
-            # self.my_image = Image.open("image/logo.png")
-            # self.my_image = ImageTk.PhotoImage(self.my_image.resize((200, 200)))  # Resize the image
-            # self.image_label = ctk.CTkLabel(master=self.frame, image=self.my_image, text="")
-            # self.image_label.pack(pady=0, padx=0)
+            self.my_image = Image.open("interface/image/logo.png")
+            self.my_image = ImageTk.PhotoImage(self.my_image.resize((200, 200)))  # Resize the image
+            self.image_label = ctk.CTkLabel(master=self.frame, image=self.my_image, text="")
+            self.image_label.pack(pady=0, padx=0)
 
             self.label = ctk.CTkLabel(master=self.frame, text='')
             self.label.pack(pady=12, padx=10)
