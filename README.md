@@ -72,32 +72,32 @@ pip3 install psycopg2
 <img src="/img/tabelaUsuario.png">
 
 2. Cadastro de Pessoas
-<img src="/img/pessoas.png">
-<img src="/img/cadastro-pessoa.png">
-<img src="/img/cadastro-pessoa-sucesso.png">
-<img src="/img/pesquisa-pessoa.png">
+<img src="/img/pessoas.PNG">
+<img src="/img/cadastro-pessoa.PNG">
+<img src="/img/cadastro-pessoa-sucesso.PNG">
+<img src="/img/pesquisa-pessoa.PNG">
 
 3. Cadastro de Produtos 
-<img src="/img/cadastro-produto.png">
-<img src="/img/cadastro-produto-sucesso.png">
-<img src="/img/cadastro-album-sucesso.png">
-<img src="/img/cadastro-single-faixa-musical.png">
+<img src="/img/cadastro-produto.PNG">
+<img src="/img/cadastro-produto-sucesso.PNG">
+<img src="/img/cadastro-album-sucesso.PNG">
+<img src="/img/cadastro-single-faixa-musical.PNG">
 
 4. Visualizar produtos e faixas daquele usuário
-<img src="/img/tela-inicial.png">
+<img src="/img/tela-inicial.PNG">
 
 5. Visualizar relatórios
-<img src="/img/RELATORTIOS.png">
-<img src="/img/reproducoes-faixa.png">
-<img src="/img/relatorios-faixa.png">
-<img src="/img/reproducoes-album.png">
-<img src="/img/relatorio-artista.png">
-<img src="/img/relatorio-artista-mostrar.png">
+<img src="/img/RELATORTIOS.PNG">
+<img src="/img/reproducoes-faixa.PNG">
+<img src="/img/relatorios-faixa.PNG">
+<img src="/img/reproducoes-album.PNG">
+<img src="/img/relatorio-artista.PNG">
+<img src="/img/relatorio-artista-mostrar.PNG">
 
 6. Deletar
 
-<img src="/img/procurar-produto-delete.png">
-<img src="/img/sucesso-procura-delete.png">
+<img src="/img/procurar-produto-delete.PNG">
+<img src="/img/sucesso-procura-delete.PNG">
 
 
 
