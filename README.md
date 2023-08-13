@@ -74,12 +74,10 @@ pip3 install psycopg2
 2. Cadastro de Pessoas
 <img src="/img/pessoas.PNG">
 <img src="/img/cadastro-pessoa.PNG">
-<img src="/img/cadastro-pessoa-sucesso.PNG">
 <img src="/img/pesquisa-pessoa.PNG">
 
 3. Cadastro de Produtos 
 <img src="/img/cadastro-produto.PNG">
-<img src="/img/cadastro-produto-sucesso.PNG">
 <img src="/img/cadastro-album-sucesso.PNG">
 <img src="/img/cadastro-single-faixa-musical.PNG">
 
@@ -87,7 +85,7 @@ pip3 install psycopg2
 <img src="/img/tela-inicial.PNG">
 
 5. Visualizar relatórios
-<img src="/img/RELATORTIOS.PNG">
+<img src="/img/RELATORIOS.PNG">
 <img src="/img/reproducoes-faixa.PNG">
 <img src="/img/relatorios-faixa.PNG">
 <img src="/img/reproducoes-album.PNG">
