@@ -850,7 +850,7 @@ class Produto:
             # realiza busca
             buscaCpf = """ SELECT SUM(DISTINCT "QuantidadeReproducao") 
             FROM public."Reproduzida", public."Participa"
-            where "fk_Pessoa_CPF" = %s and "TipoPessoa" = 'Artista' """
+            where "fk_Pessoa_CPF" = %s and "TipoPessoa" = 'autor' """
             bd.execute(buscaCpf, (self.cpfEntry.get(),))
             self.buscaCpf = bd.fetchone()
 

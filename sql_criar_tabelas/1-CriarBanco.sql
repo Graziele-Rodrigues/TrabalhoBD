@@ -27,7 +27,7 @@ CREATE TABLE "Produto" (
 CREATE TABLE "Album" (
   "fk_Produto_CodigoBarras" varchar(255) PRIMARY KEY,
   CONSTRAINT "fk_Album_fk_Produto_CodigoBarras" FOREIGN KEY ("fk_Produto_CodigoBarras") REFERENCES "Produto" ("CodigoBarras")
-    ON DELETE SET NULL
+    ON DELETE CASCADE
     ON UPDATE CASCADE
 );
 

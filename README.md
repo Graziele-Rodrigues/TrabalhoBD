@@ -72,19 +72,33 @@ pip3 install psycopg2
 <img src="/img/tabelaUsuario.png">
 
 2. Cadastro de Pessoas
-<img src="/img/cadastroPessoa.png">
-<img src="/img/cpfexiste.png">
-<img src="/img/cadastroPessoa2.png">
-<img src="/img/consultaPessoaCpf.png">
-<img src="/img/consultaPessoaNome.png">
+<img src="/img/pessoas.png">
+<img src="/img/cadastro-pessoa.png">
+<img src="/img/cadastro-pessoa-sucesso.png">
+<img src="/img/pesquisa-pessoa.png">
 
 3. Cadastro de Produtos 
+<img src="/img/cadastro-produto.png">
+<img src="/img/cadastro-produto-sucesso.png">
+<img src="/img/cadastro-album-sucesso.png">
+<img src="/img/cadastro-single-faixa-musical.png">
 
 4. Visualizar produtos e faixas daquele usuário
+<img src="/img/tela-inicial.png">
 
 5. Visualizar relatórios
+<img src="/img/RELATORTIOS.png">
+<img src="/img/reproducoes-faixa.png">
+<img src="/img/relatorios-faixa.png">
+<img src="/img/reproducoes-album.png">
+<img src="/img/relatorio-artista.png">
+<img src="/img/relatorio-artista-mostrar.png">
 
 6. Deletar
+
+<img src="/img/procurar-produto-delete.png">
+<img src="/img/sucesso-procura-delete.png">
+
 
 
 ## 📦 Implantação
