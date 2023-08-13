@@ -74,7 +74,7 @@ pip3 install psycopg2
 2. Cadastro de Pessoas
 <img src="/img/pessoas.PNG">
 <img src="/img/cadastro-pessoa.PNG">
-<img src="/img/pesquisa-pessoa.PNG">
+<img src="/img/pesquisar-pessoa.PNG">
 
 3. Cadastro de Produtos 
 <img src="/img/cadastro-produto.PNG">
@@ -89,6 +89,7 @@ pip3 install psycopg2
 <img src="/img/reproducoes-faixa.PNG">
 <img src="/img/relatorios-faixa.PNG">
 <img src="/img/reproducoes-album.PNG">
+<img src="/img/relatorio-album.PNG">
 <img src="/img/relatorio-artista.PNG">
 <img src="/img/relatorio-artista-mostrar.PNG">
 
