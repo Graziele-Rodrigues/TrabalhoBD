@@ -72,7 +72,7 @@ pip3 install psycopg2
 <img src="/img/tabelaUsuario.png">
 
 2. Cadastro de Pessoas
-<img src="/img/pessoas.PNG">
+<img src="/img/pagina-pessoas.PNG">
 <img src="/img/cadastro-pessoa.PNG">
 <img src="/img/pesquisar-pessoa.PNG">
 
